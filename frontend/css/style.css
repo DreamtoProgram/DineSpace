@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap');
+
+:root {
+  --color-primary: #FF5E1E;
+  --color-primary-hover: #E85012;
+  --color-primary-glow: rgba(255, 94, 30, 0.25);
+  --color-dark-bg: #070B11;
+  --color-dark-surface: #0E1624;
+  --color-dark-card: #111A2C;
+  --color-dark-border: rgba(255, 255, 255, 0.08);
+  --color-dark-input: #121C2F;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-dark-bg);
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif-quote {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Ambient glow backgrounds */
+.ambient-glow-left {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(255, 94, 30, 0.07) 0%, rgba(7, 11, 17, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-card {
+  position: absolute;
+  top: 50%;
+  right: 15%;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(255, 94, 30, 0.06) 0%, rgba(7, 11, 17, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card Styling */
+.glass-card {
+  background: rgba(14, 22, 36, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.04);
+}
+
+.feature-pill {
+  background: rgba(17, 26, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease-in-out;
+}
+
+.feature-pill:hover {
+  background: rgba(23, 34, 56, 0.9);
+  border-color: rgba(255, 94, 30, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Input Styles */
+.custom-input {
+  background-color: #121C2F;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.custom-input:focus {
+  outline: none;
+  border-color: #FF5E1E;
+  box-shadow: 0 0 0 2px rgba(255, 94, 30, 0.2);
+  background-color: #142036;
+}
+
+.custom-input::placeholder {
+  color: #5A6A85;
+}
+
+/* Primary Button with warm orange glow */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6624 0%, #FF5014 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px 0 rgba(255, 94, 30, 0.35);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #FF7336 0%, #EA4C10 100%);
+  box-shadow: 0 6px 22px 0 rgba(255, 94, 30, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary outline button */
+.btn-secondary {
+  background: rgba(14, 22, 36, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E2E8F0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(22, 33, 53, 0.85);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #FFFFFF;
+}
+
+/* Toast alerts */
+.toast-error {
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #FCA5A5;
+}
+
+.toast-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6EE7B7;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #070B11;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C283F;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2E3E5E;
+}

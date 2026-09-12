@@ -1,0 +1,496 @@
+import os
+
+os.makedirs("../frontend/js", exist_ok=True)
+
+# 1. Create frontend/visit_completed.html
+completed_html = """<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DineSpace — Visit Completed!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF5E1E',
+              orangeHover: '#EA4C10',
+              orangeGlow: 'rgba(255, 94, 30, 0.35)',
+              darkBg: '#070B11',
+              darkSidebar: '#0A0F18',
+              darkCard: '#0D1522',
+              darkBorder: 'rgba(255, 255, 255, 0.07)',
+              textMuted: '#8B9BB4'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serifQuote: ['"Playfair Display"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Outer glowing card matching designed_pages/page_7.png */
+    .completed-outer-card {
+      width: 632px;
+      background: rgba(13, 19, 28, 0.88);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 94, 30, 0.32);
+      box-shadow: 0 0 65px -6px rgba(255, 94, 30, 0.22), inset 0 0 25px -10px rgba(255, 94, 30, 0.05);
+      border-radius: 32px;
+      transition: all 0.3s ease;
+    }
+
+    .completed-outer-card:hover {
+      box-shadow: 0 0 78px -4px rgba(255, 94, 30, 0.28), inset 0 0 30px -8px rgba(255, 94, 30, 0.08);
+    }
+
+    /* Green checkmark circle */
+    .green-glow-circle {
+      width: 104px;
+      height: 104px;
+      border-radius: 9999px;
+      background: rgba(8, 26, 16, 0.85);
+      border: 1.5px solid #22C55E;
+      box-shadow: 0 0 32px rgba(34, 197, 94, 0.45), inset 0 0 16px rgba(34, 197, 94, 0.18);
+    }
+  </style>
+</head>
+<body class="bg-[#070B11] text-white min-h-screen flex overflow-x-hidden selection:bg-[#FF5E1E] selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDEBAR                                                              -->
+  <!-- ========================================================================= -->
+  <aside class="w-[292px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex flex-col justify-between p-6 min-h-screen z-20">
+    
+    <!-- Top Brand & Navigation -->
+    <div class="space-y-8">
+      
+      <!-- DineSpace Brand Logo -->
+      <a href="home.html" class="flex items-center gap-3.5 px-2 group">
+        <div class="w-11 h-11 rounded-xl overflow-hidden shadow-inner flex items-center justify-center flex-shrink-0 bg-[#221511] border border-orange-500/20">
+          <img src="assets/images/login_badge.png" alt="DineSpace" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-baseline tracking-tight">
+            <span class="text-xl font-bold text-white">Dine</span>
+            <span class="text-xl font-bold text-[#FF5E1E]">Space</span>
+          </div>
+          <span class="text-[11px] text-[#8B9BB4] tracking-wide font-medium -mt-1">Find your seat. Enjoy your meal.</span>
+        </div>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav class="space-y-2 pt-2">
+        
+        <!-- Home -->
+        <a href="home.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span>Home</span>
+        </a>
+
+        <!-- Find a Seat -->
+        <a href="seats.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 19v2m12-2v2M5 14h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2zm0 0v5h14v-5"></path>
+          </svg>
+          <span>Find a Seat</span>
+        </a>
+
+        <!-- Menu -->
+        <a href="menu.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v2m-8 12h16a1 1 0 001-1 9 9 0 00-18 0 1 1 0 001 1zM4 18h16"></path>
+          </svg>
+          <span>Menu</span>
+        </a>
+
+        <!-- My Visit -->
+        <a href="my_visit.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2"></rect>
+            <line x1="8" y1="9" x2="16" y2="9" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="8" y1="13" x2="13" y2="13" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+          <span>My Visit</span>
+        </a>
+
+        <!-- Visit History -->
+        <a href="visit_history.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+            <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"></polyline>
+          </svg>
+          <span>Visit History</span>
+        </a>
+
+        <!-- Section Divider -->
+        <div class="pt-4 pb-2">
+          <div class="border-t border-white/5"></div>
+        </div>
+
+        <!-- Notifications -->
+        <a href="notifications.html" class="flex items-center justify-between px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <div class="flex items-center gap-4">
+            <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span>Notifications</span>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#FF5E1E]"></span>
+        </a>
+
+        <!-- Settings -->
+        <a href="settings.html" class="flex items-center gap-4 px-4 py-3 rounded-xl text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+
+      </nav>
+    </div>
+
+    <!-- Lower Sidebar Footer -->
+    <div class="px-2 pt-6 space-y-4">
+      <div>
+        <div class="w-7 h-[3px] bg-[#FF5E1E] mb-3 rounded-full"></div>
+        <p class="font-serif-quote italic text-lg text-gray-200 tracking-wide leading-snug">
+          “Good Food<br>Brighter Days”
+        </p>
+      </div>
+
+      <div class="w-16 h-16 opacity-85">
+        <img src="assets/images/leaf_illustration.png" alt="Leaf" class="w-full h-full object-contain filter drop-shadow-sm" />
+      </div>
+
+      <div class="text-xs text-[#5A6A85] leading-relaxed">
+        Eat Well. Do More.<br>At Campus.
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTENT AREA                                                         -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 flex flex-col min-h-screen overflow-y-auto">
+    
+    <!-- Top Header Bar (Height: 84px matching designed_pages/page_7.png) -->
+    <header class="h-[84px] border-b border-white/5 px-10 flex items-center justify-between bg-[#070B11]/90 backdrop-blur-md sticky top-0 z-30">
+      
+      <!-- Search Input -->
+      <div class="relative w-84">
+        <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#5A6A85] pointer-events-none">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" stroke-width="2"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+        </div>
+        <input 
+          type="text" 
+          placeholder="Search for something..." 
+          class="w-full bg-[#0C1320] border border-white/5 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-[#5A6A85] focus:outline-none focus:border-orange-500/50"
+        />
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-6">
+        
+        <!-- Notification Bell -->
+        <a href="notifications.html" class="relative p-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#FF5E1E]"></span>
+        </a>
+
+        <!-- User Profile Pill -->
+        <div class="relative">
+          <button id="user-menu-btn" class="flex items-center gap-3 p-1.5 pr-2.5 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
+            <img id="user-avatar" src="assets/images/user_avatar.png" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-white/10" />
+            <div class="text-left hidden sm:block">
+              <div id="user-name" class="text-xs font-semibold text-white">Kunal Kumar Singh</div>
+              <div id="user-role" class="text-[10px] text-[#8B9BB4]">P132-NNK | CSE</div>
+            </div>
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-[#0E1726] border border-white/10 shadow-2xl py-2 z-50 text-xs">
+            <a href="settings.html" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-white/5">Settings & Profile</a>
+            <div class="border-t border-white/5 my-1"></div>
+            <button id="logout-btn" class="w-full text-left px-4 py-2 text-red-400 hover:bg-red-500/10 cursor-pointer">Sign Out</button>
+          </div>
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- Page Content Container -->
+    <div class="px-14 pt-8 pb-10 flex-1 flex flex-col justify-between max-w-[1200px]">
+      
+      <!-- Back Link (No outer heading in designed_pages/page_7.png) -->
+      <div>
+        <a href="home.html" class="inline-flex items-center gap-2.5 text-sm font-medium text-gray-400 hover:text-white transition-colors group">
+          <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <line x1="19" y1="12" x2="5" y2="12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline points="12 19 5 12 12 5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+          <span>Back</span>
+        </a>
+      </div>
+
+      <!-- Main Center Glowing Card (632px wide matching page_7.png) -->
+      <div class="flex flex-col items-center justify-center my-auto py-1">
+        <div class="completed-outer-card p-10 flex flex-col items-center justify-between relative">
+          
+          <!-- Top Green Glowing Circle with Mint Checkmark -->
+          <div class="green-glow-circle flex items-center justify-center flex-shrink-0 mt-1">
+            <svg class="w-14 h-14" viewBox="0 0 52 52" fill="none">
+              <path d="M15 27 L23 35 L37 19" stroke="#86EFAC" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Titles Section inside Card -->
+          <div class="text-center mt-6 space-y-1.5">
+            <h1 class="text-[34px] font-bold text-white tracking-tight leading-tight">
+              Visit Completed!
+            </h1>
+            <p id="thanks-name" class="text-lg text-gray-200 font-normal">
+              Thanks, Kunal!
+            </p>
+            <p class="text-base text-gray-300 font-normal leading-relaxed pt-1">
+              Your seat <span id="completed-seat-num" class="text-[#FF5E1E] font-bold">#24</span> is now<br>
+              available for another student.
+            </p>
+          </div>
+
+          <!-- Divider Line -->
+          <div class="w-full h-[1px] bg-white/5 my-7"></div>
+
+          <!-- Summary Details List (4 Rows exactly matching page_7.png) -->
+          <div class="w-full space-y-5 px-3">
+            
+            <!-- Row 1: Dining Hall -->
+            <div class="flex items-center gap-4">
+              <!-- Building Facade Icon in Orange #FF5E1E -->
+              <svg class="w-8 h-8 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 10.5 L14 3.5 L25 10.5"/>
+                <rect x="4.5" y="10.5" width="19" height="13.5" rx="1"/>
+                <rect x="7.5" y="13.5" width="3" height="3" rx="0.5"/>
+                <rect x="17.5" y="13.5" width="3" height="3" rx="0.5"/>
+                <path d="M11.5 24 V18.5 C11.5 17.5 12.5 17 14 17 C15.5 17 16.5 17.5 16.5 18.5 V24"/>
+                <line x1="2" y1="24" x2="26" y2="24"/>
+              </svg>
+              <div>
+                <div class="text-xs text-[#8B9BB4] font-normal">Dining Hall</div>
+                <div id="dining-hall-name" class="text-base font-semibold text-white tracking-tight leading-tight">Central Mess</div>
+              </div>
+            </div>
+
+            <!-- Row 2: Entered Time -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <!-- Clock Icon -->
+                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9.5"/>
+                  <polyline points="12 7.5 12 12 15.5 15"/>
+                </svg>
+                <span class="text-sm text-gray-300 font-normal">Entered</span>
+              </div>
+              <span id="entered-time" class="text-base font-semibold text-white tracking-tight">10:26 PM</span>
+            </div>
+
+            <!-- Row 3: Exited Time -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <!-- Circle Arrow Icon -->
+                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9.5"/>
+                  <polyline points="12 8 16 12 12 16"/>
+                  <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                <span class="text-sm text-gray-300 font-normal">Exited</span>
+              </div>
+              <span id="exited-time" class="text-base font-semibold text-white tracking-tight">10:44 PM</span>
+            </div>
+
+            <!-- Row 4: Visit Duration -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <!-- Hourglass Icon -->
+                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 2h14M5 22h14M6 2v5l5 5-5 5v5M18 2v5l-5 5 5 5v5"/>
+                </svg>
+                <span class="text-sm text-gray-300 font-normal">Visit Duration</span>
+              </div>
+              <span id="visit-duration" class="text-base font-semibold text-white tracking-tight">18 min</span>
+            </div>
+
+          </div>
+
+          <!-- Primary CTA Button: Back to Home -->
+          <a 
+            href="home.html" 
+            class="w-full h-[58px] rounded-[20px] bg-[#FF5E1E] hover:bg-[#EA4C10] font-bold text-base text-[#111827] flex items-center justify-center gap-3 transition-all cursor-pointer shadow-lg shadow-orange-500/25 group mt-8"
+          >
+            <span>Back to Home</span>
+            <svg class="w-5 h-5 text-[#111827] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></line>
+              <polyline points="12 5 19 12 12 19" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Spacer -->
+      <div class="h-2"></div>
+
+    </div>
+
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/visit_completed.js"></script>
+</body>
+</html>
+"""
+
+with open("../frontend/visit_completed.html", "w", encoding="utf-8") as f:
+    f.write(completed_html.strip())
+
+# 2. Create frontend/js/visit_completed.js
+completed_js = """/**
+ * Page 7: Visit Completed Logic
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+  const logoutBtn = document.getElementById('logout-btn');
+  const userNameEl = document.getElementById('user-name');
+  const userRoleEl = document.getElementById('user-role');
+  const thanksName = document.getElementById('thanks-name');
+  const completedSeatNum = document.getElementById('completed-seat-num');
+  const diningHallName = document.getElementById('dining-hall-name');
+  const enteredTimeEl = document.getElementById('entered-time');
+  const exitedTimeEl = document.getElementById('exited-time');
+  const visitDurationEl = document.getElementById('visit-duration');
+
+  // Header Dropdown
+  if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', () => {
+      userDropdown.classList.add('hidden');
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => Auth.logout());
+  }
+
+  // Load User Profile
+  if (Auth.isAuthenticated()) {
+    try {
+      const me = await API.getMe();
+      if (me && me.student) {
+        const firstName = me.student.name ? me.student.name.split(' ')[0] : 'Kunal';
+        if (thanksName) thanksName.textContent = `Thanks, ${firstName}!`;
+        if (userNameEl) userNameEl.textContent = me.student.name || 'Kunal Kumar Singh';
+        if (userRoleEl) userRoleEl.textContent = `${me.student.studentId} | CSE`;
+      }
+    } catch (e) {
+      console.warn('Could not fetch user profile:', e);
+    }
+  }
+
+  // Helper to format ISO time string to "10:26 PM"
+  function formatTime(isoStr) {
+    if (!isoStr) return null;
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return null;
+    const hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes} ${ampm}`;
+  }
+
+  // Load exit success result from Page 6 (tray_return.html)
+  const exitDataStr = sessionStorage.getItem('dinespace_exit_success');
+  let visit = null;
+  if (exitDataStr) {
+    try {
+      const parsed = JSON.parse(exitDataStr);
+      visit = parsed.visit || parsed;
+    } catch (e) {
+      console.warn('Could not parse exit data:', e);
+    }
+  }
+
+  if (visit) {
+    if (completedSeatNum) completedSeatNum.textContent = `#${visit.seatNumber || 24}`;
+    if (diningHallName) diningHallName.textContent = visit.diningHall || 'Central Mess';
+    if (enteredTimeEl && visit.entryTime) {
+      const formatted = formatTime(visit.entryTime);
+      if (formatted) enteredTimeEl.textContent = formatted;
+    }
+    if (exitedTimeEl && visit.exitTime) {
+      const formatted = formatTime(visit.exitTime);
+      if (formatted) exitedTimeEl.textContent = formatted;
+    }
+    if (visitDurationEl) {
+      visitDurationEl.textContent = `${visit.durationMinutes || 18} min`;
+    }
+  } else {
+    // If opened directly, attempt to fetch latest completed visit from history
+    try {
+      const hist = await API.getVisitHistory(1, 1);
+      if (hist && hist.visits && hist.visits.length > 0) {
+        const latest = hist.visits[0];
+        if (completedSeatNum) completedSeatNum.textContent = `#${latest.seatNumber || 24}`;
+        if (diningHallName) diningHallName.textContent = latest.diningHall || 'Central Mess';
+        if (enteredTimeEl && latest.entryTime) {
+          const formatted = formatTime(latest.entryTime);
+          if (formatted) enteredTimeEl.textContent = formatted;
+        }
+        if (exitedTimeEl && latest.exitTime) {
+          const formatted = formatTime(latest.exitTime);
+          if (formatted) exitedTimeEl.textContent = formatted;
+        }
+        if (visitDurationEl) {
+          visitDurationEl.textContent = `${latest.durationMinutes || 18} min`;
+        }
+      }
+    } catch (err) {
+      // Retain design default matching designed_pages/page_7.png (#24, 10:26 PM, 10:44 PM, 18 min)
+      console.log('Using default design values:', err);
+    }
+  }
+});
+"""
+
+with open("../frontend/js/visit_completed.js", "w", encoding="utf-8") as f:
+    f.write(completed_js.strip())
+
+print("Successfully generated visit_completed.html and visit_completed.js")
