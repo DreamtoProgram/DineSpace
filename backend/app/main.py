@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
@@ -109,7 +109,26 @@ app.include_router(visits_router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
 
-frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
-if os.path.isdir(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+# Determine frontend static directory with fallbacks
+frontend_candidates = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend")),
+    os.path.abspath(os.path.join(os.getcwd(), "frontend")),
+    os.path.abspath(os.path.join(os.getcwd(), "..", "frontend")),
+]
+resolved_frontend_dir = next((d for d in frontend_candidates if os.path.isdir(d)), None)
+
+if resolved_frontend_dir:
+    @app.middleware("http")
+    async def clean_url_middleware(request: Request, call_next):
+        path = request.url.path
+        if not path.startswith(settings.API_V1_PREFIX) and not path.startswith("/docs") and not path.startswith("/openapi.json"):
+            clean_name = path.strip("/")
+            if clean_name and "." not in clean_name:
+                html_candidate = os.path.join(resolved_frontend_dir, f"{clean_name}.html")
+                if os.path.isfile(html_candidate):
+                    return FileResponse(html_candidate)
+        return await call_next(request)
+
+    app.mount("/", StaticFiles(directory=resolved_frontend_dir, html=True), name="frontend")
+
 

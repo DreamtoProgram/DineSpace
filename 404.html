@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DineSpace — Redirecting</title>
+  <script>
+    (function() {
+      // Extract segment to route to right frontend page
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const last = parts[parts.length - 1] || '';
+      
+      const knownPages = [
+        'login', 'home', 'seats', 'menu', 'entry_scan', 
+        'entry_success', 'my_visit', 'tray_return', 
+        'visit_completed', 'visit_history', 'notifications', 'settings'
+      ];
+      
+      let target = 'login.html';
+      const cleanLast = last.replace('.html', '').toLowerCase();
+      if (knownPages.includes(cleanLast)) {
+        target = cleanLast + '.html';
+      } else if (localStorage.getItem('dinespace_jwt_token')) {
+        target = 'home.html';
+      }
+      
+      // Determine repo base
+      const isGitHubPages = window.location.hostname.includes('github.io');
+      const repoName = isGitHubPages && parts.length > 0 ? '/' + parts[0] : '';
+      
+      window.location.replace(repoName + '/frontend/' + target + window.location.search + window.location.hash);
+    })();
+  </script>
+</head>
+<body style="background-color: #070B11; color: #FFFFFF; font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <p style="color: #8B9BB4;">Redirecting to DineSpace...</p>
+</body>
+</html>

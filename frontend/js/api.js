@@ -2,10 +2,25 @@
  * DineSpace API Client
  */
 const API_CONFIG = {
-  // If running on the same host:port as FastAPI, use relative path, else default to backend port 8000
-  baseUrl: (window.location.hostname === '127.0.0.1' && window.location.port === '8000') 
-    ? '/api' 
-    : 'http://127.0.0.1:8000/api',
+  // Determine API base URL dynamically
+  baseUrl: (() => {
+    if (typeof window !== 'undefined') {
+      if (window.DINESPACE_API_URL) return window.DINESPACE_API_URL;
+      const stored = localStorage.getItem('dinespace_api_url');
+      if (stored) return stored;
+      
+      // If hosted on live domain or same origin as backend
+      if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+        // If local development port that is not 8000 (e.g. 5500, 3000)
+        if ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && 
+            window.location.port !== '8000' && window.location.port !== '') {
+          return 'http://127.0.0.1:8000/api';
+        }
+        return '/api';
+      }
+    }
+    return 'http://127.0.0.1:8000/api';
+  })(),
   tokenKey: 'dinespace_jwt_token',
   userKey: 'dinespace_user_info'
 };
