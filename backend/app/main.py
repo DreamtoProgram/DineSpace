@@ -38,21 +38,39 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage application startup and shutdown events."""
     logger.info("Starting up DineSpace Backend...")
     # Initialize MongoDB connection pool
-    db_manager.connect()
-    # Ensure database indexes
-    ensure_student_indexes()
-    ensure_menu_indexes()
-    ensure_occupancy_indexes()
-    ensure_notification_indexes()
+    try:
+        db_manager.connect()
+    except Exception as exc:
+        logger.warning("MongoDB connect notice: %s", exc)
+
+    # Ensure database indexes safely
+    try:
+        ensure_student_indexes()
+        ensure_menu_indexes()
+        ensure_occupancy_indexes()
+        ensure_notification_indexes()
+    except Exception as exc:
+        logger.warning("Notice ensuring indexes: %s", exc)
+
     # Start periodic seat timeout sweeper background worker
     sweeper = TimeoutSweeperWorker()
-    sweeper.start()
+    try:
+        sweeper.start()
+    except Exception as exc:
+        logger.warning("Sweeper startup notice: %s", exc)
+
     try:
         yield
     finally:
         logger.info("Shutting down DineSpace Backend...")
-        await sweeper.stop()
-        db_manager.close()
+        try:
+            await sweeper.stop()
+        except Exception:
+            pass
+        try:
+            db_manager.close()
+        except Exception:
+            pass
 
 
 

@@ -115,6 +115,8 @@ const API = {
     const res = await apiRequest('/auth/me');
     if (res.student) {
       Auth.setUser(res.student);
+    } else if (res.studentId) {
+      Auth.setUser(res);
     }
     return res;
   },

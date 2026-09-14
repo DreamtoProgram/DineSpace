@@ -20,26 +20,42 @@ class DatabaseManager:
     def connect(self) -> None:
         """Initialize MongoDB client and test connectivity."""
         settings = get_settings()
+        self._is_connected = False
         try:
             self.client = MongoClient(
                 settings.MONGODB_URI,
                 serverSelectionTimeoutMS=settings.MONGODB_SERVER_SELECTION_TIMEOUT_MS,
             )
-            self.db = self.client[settings.MONGODB_DATABASE]
+            # Support database name specified in connection URI (e.g. Atlas mongodb+srv://.../dinespace)
+            try:
+                self.db = self.client.get_default_database()
+            except Exception:
+                self.db = None
+
+            if self.db is None:
+                self.db = self.client[settings.MONGODB_DATABASE]
+
             # Ping database to verify connection immediately
             self.client.admin.command("ping")
+            self._is_connected = True
             logger.info(
                 "Successfully connected to MongoDB database '%s' at %s",
-                settings.MONGODB_DATABASE,
+                self.db.name,
                 settings.MONGODB_URI,
             )
-        except (ConnectionFailure, ServerSelectionTimeoutError) as exc:
+        except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as exc:
+            self._is_connected = False
             logger.warning(
                 "MongoDB connection ping failed at %s. Error: %s. "
-                "Database operations will be unavailable until MongoDB is running.",
+                "Running in resilient demo/fallback mode until MongoDB is reachable.",
                 settings.MONGODB_URI,
                 exc,
             )
+
+    @property
+    def is_connected(self) -> bool:
+        """Return True if connection to MongoDB was verified."""
+        return getattr(self, "_is_connected", False)
 
     def close(self) -> None:
         """Close the MongoDB connection pool."""

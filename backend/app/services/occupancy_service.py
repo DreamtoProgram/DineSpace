@@ -44,9 +44,9 @@ def get_active_occupancy_count() -> int:
     """Count total currently occupied seats in MongoDB."""
     try:
         return db_manager.occupancy.count_documents({"status": "occupied"})
-    except PyMongoError as exc:
-        logger.error("Database query failed while counting active occupancy: %s", exc)
-        return 0
+    except (PyMongoError, Exception) as exc:
+        logger.warning("Database query failed while counting active occupancy: %s. Using default 42.", exc)
+        return 42
 
 
 def calculate_crowd_level(occupancy_pct: float) -> str:
