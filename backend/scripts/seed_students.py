@@ -29,6 +29,12 @@ DEMO_STUDENTS = [
         "isActive": True,
     },
     {
+        "studentId": "P132-NNK",
+        "name": "Kunal Kumar Singh",
+        "passCode": "PASS-1042",
+        "isActive": True,
+    },
+    {
         "studentId": "STU1043",
         "name": "Alex Sharma",
         "passCode": "PASS-8843",
