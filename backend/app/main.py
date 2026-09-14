@@ -109,26 +109,36 @@ app.include_router(visits_router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
 
-# Determine frontend static directory with fallbacks
+# Determine frontend static directory with comprehensive fallbacks
 frontend_candidates = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend")),
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend")),
     os.path.abspath(os.path.join(os.getcwd(), "frontend")),
     os.path.abspath(os.path.join(os.getcwd(), "..", "frontend")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "frontend")),
 ]
 resolved_frontend_dir = next((d for d in frontend_candidates if os.path.isdir(d)), None)
 
 if resolved_frontend_dir:
+    logger.info("Serving frontend static files from: %s", resolved_frontend_dir)
+
     @app.middleware("http")
     async def clean_url_middleware(request: Request, call_next):
         path = request.url.path
         if not path.startswith(settings.API_V1_PREFIX) and not path.startswith("/docs") and not path.startswith("/openapi.json"):
             clean_name = path.strip("/")
-            if clean_name and "." not in clean_name:
+            if not clean_name:
+                index_file = os.path.join(resolved_frontend_dir, "index.html")
+                if os.path.isfile(index_file):
+                    return FileResponse(index_file)
+            elif "." not in clean_name:
                 html_candidate = os.path.join(resolved_frontend_dir, f"{clean_name}.html")
                 if os.path.isfile(html_candidate):
                     return FileResponse(html_candidate)
         return await call_next(request)
 
     app.mount("/", StaticFiles(directory=resolved_frontend_dir, html=True), name="frontend")
+else:
+    logger.warning("No frontend directory found among candidates: %s", frontend_candidates)
 
 
