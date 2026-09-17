@@ -27,13 +27,15 @@ const API_CONFIG = {
 
 const Auth = {
   getToken() {
-    return localStorage.getItem(API_CONFIG.tokenKey);
+    return localStorage.getItem(API_CONFIG.tokenKey) || localStorage.getItem('dinespace_token');
   },
   setToken(token) {
     localStorage.setItem(API_CONFIG.tokenKey, token);
+    localStorage.setItem('dinespace_token', token);
   },
   removeToken() {
     localStorage.removeItem(API_CONFIG.tokenKey);
+    localStorage.removeItem('dinespace_token');
     localStorage.removeItem(API_CONFIG.userKey);
   },
   getUser() {
@@ -49,6 +51,10 @@ const Auth = {
   },
   isAuthenticated() {
     return !!this.getToken();
+  },
+  isDemoSession() {
+    const token = this.getToken();
+    return !!(token && (token.startsWith('demo_') || token.startsWith('demo_token_')));
   },
   logout() {
     this.removeToken();
@@ -68,13 +74,19 @@ async function apiRequest(endpoint, options = {}) {
     headers['Authorization'] = 'Bearer ' + token;
   }
 
+  // Network timeout to prevent hung requests
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 4000);
+
   const config = {
     ...options,
-    headers
+    headers,
+    signal: controller.signal
   };
 
   try {
     const response = await fetch(url, config);
+    clearTimeout(timeoutId);
     const data = await response.json().catch(() => ({}));
     
     if (!response.ok) {
@@ -87,9 +99,11 @@ async function apiRequest(endpoint, options = {}) {
     
     return data;
   } catch (err) {
-    if (err.status === 401) {
-      // Unauthorized token - clear and redirect if on protected page
-      if (!window.location.pathname.endsWith('login.html')) {
+    clearTimeout(timeoutId);
+    // Never auto-logout if in demo/offline session or if request was aborted
+    if (err.status === 401 && !Auth.isDemoSession()) {
+      // Only logout if the primary profile endpoint explicitly rejected an expired token
+      if (endpoint === '/auth/me' && !window.location.pathname.endsWith('login.html')) {
         Auth.logout();
       }
     }

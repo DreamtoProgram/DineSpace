@@ -39,19 +39,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Load User & Visit Info
+  // Load User Info (Instant paint from cache)
+  const cachedUser = Auth.getUser();
+  if (cachedUser) {
+    const firstName = cachedUser.name ? cachedUser.name.split(' ')[0] : 'Student';
+    if (welcomeSubtitle) welcomeSubtitle.textContent = `Welcome to the mess, ${firstName}.`;
+    if (userNameEl) userNameEl.textContent = cachedUser.name || 'Student';
+    if (userRoleEl) userRoleEl.textContent = `${cachedUser.studentId || 'STU1042'} | Central Mess`;
+  }
+
   if (Auth.isAuthenticated()) {
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        const firstName = me.student.name ? me.student.name.split(' ')[0] : 'Kunal';
+    API.getMe().then(me => {
+      const student = me.student || (me.studentId ? me : null);
+      if (student) {
+        Auth.setUser(student);
+        const firstName = student.name ? student.name.split(' ')[0] : 'Student';
         if (welcomeSubtitle) welcomeSubtitle.textContent = `Welcome to the mess, ${firstName}.`;
-        if (userNameEl) userNameEl.textContent = me.student.name || 'Kunal Kumar Singh';
-        if (userRoleEl) userRoleEl.textContent = `${me.student.studentId} | CSE`;
+        if (userNameEl) userNameEl.textContent = student.name || 'Student';
+        if (userRoleEl) userRoleEl.textContent = `${student.studentId} | Central Mess`;
       }
-    } catch (e) {
-      console.warn('Could not fetch user profile:', e);
-    }
+    }).catch(() => {});
   }
 
   // Populate Seat & Entry Time

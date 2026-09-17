@@ -65,6 +65,8 @@ def validate_date_format(date_str: str) -> str:
 
 def ensure_menu_indexes() -> None:
     """Ensure compound unique index on (date, mealType) exists in MongoDB menu collection."""
+    if not db_manager.is_connected:
+        return
     try:
         db_manager.menu.create_index([("date", 1), ("mealType", 1)], unique=True)
         logger.info("Ensured compound unique index on menu (date, mealType)")
@@ -99,6 +101,11 @@ def get_menus_for_date(date_str: str) -> List[Dict[str, Any]]:
         List of menu documents for the date.
     """
     validate_date_format(date_str)
+    if not db_manager.is_connected:
+        return [
+            {"date": date_str, "mealType": "Lunch", "diningHall": "Central Mess", "items": DEFAULT_LUNCH_ITEMS},
+            {"date": date_str, "mealType": "Dinner", "diningHall": "Central Mess", "items": DEFAULT_DINNER_ITEMS},
+        ]
     try:
         cursor = db_manager.menu.find({"date": date_str}, {"_id": 0})
         menus = list(cursor)
@@ -124,6 +131,15 @@ def get_menu_for_date_and_meal(date_str: str, meal_type: str) -> Optional[Dict[s
         Menu document if found, None otherwise.
     """
     validate_date_format(date_str)
+    items = DEFAULT_LUNCH_ITEMS if meal_type.lower() == "lunch" else DEFAULT_DINNER_ITEMS
+    fallback_menu = {
+        "date": date_str,
+        "mealType": meal_type,
+        "diningHall": "Central Mess",
+        "items": items,
+    }
+    if not db_manager.is_connected:
+        return fallback_menu
     try:
         return db_manager.menu.find_one(
             {"date": date_str, "mealType": meal_type},
@@ -136,13 +152,7 @@ def get_menu_for_date_and_meal(date_str: str, meal_type: str) -> Optional[Dict[s
             meal_type,
             exc,
         )
-        items = DEFAULT_LUNCH_ITEMS if meal_type.lower() == "lunch" else DEFAULT_DINNER_ITEMS
-        return {
-            "date": date_str,
-            "mealType": meal_type,
-            "diningHall": "Central Mess",
-            "items": items,
-        }
+        return fallback_menu
 
 
 def upsert_menu(date_str: str, meal_type: str, items: List[Dict[str, str]]) -> Dict[str, Any]:

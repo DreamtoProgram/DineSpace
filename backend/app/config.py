@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # MongoDB configuration
     MONGODB_URI: str = "mongodb://localhost:27017"
     MONGODB_DATABASE: str = "dinespace"
-    MONGODB_SERVER_SELECTION_TIMEOUT_MS: int = 2000
+    MONGODB_SERVER_SELECTION_TIMEOUT_MS: int = 800
 
     # JWT Authentication configuration
     JWT_SECRET_KEY: str = "dinespace-dev-secret-key-change-in-production-123456789"

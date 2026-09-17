@@ -7,7 +7,7 @@
   <script>
     // Smart redirect to frontend app
     (function() {
-      const token = localStorage.getItem('dinespace_jwt_token');
+      const token = localStorage.getItem('dinespace_jwt_token') || localStorage.getItem('dinespace_token');
       const targetPage = token ? 'home.html' : 'login.html';
       
       // Determine if running under subfolder (like GitHub Pages /DineSpace/)

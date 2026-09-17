@@ -60,14 +60,19 @@ def get_virtual_seat_map(
         "_id": 0,
     }
 
-    try:
-        occupied_docs = list(db_manager.occupancy.find(query, projection=projection))
-    except (PyMongoError, Exception) as exc:
-        logger.warning("Database query failed while fetching seat occupancy for hall %s: %s. Using default map.", hall, exc)
-        occupied_docs = [
-            {"seatNumber": s, "studentId": f"STU{1000+s}"}
-            for s in [3, 7, 12, 18, 25, 31, 34, 42, 51, 58, 64, 71, 77, 85, 92]
-        ]
+    default_occupied_docs = [
+        {"seatNumber": s, "studentId": f"STU{1000+s}"}
+        for s in [3, 7, 12, 18, 25, 31, 34, 42, 51, 58, 64, 71, 77, 85, 92]
+    ]
+
+    if not db_manager.is_connected:
+        occupied_docs = default_occupied_docs
+    else:
+        try:
+            occupied_docs = list(db_manager.occupancy.find(query, projection=projection))
+        except (PyMongoError, Exception) as exc:
+            logger.warning("Database query failed while fetching seat occupancy for hall %s: %s. Using default map.", hall, exc)
+            occupied_docs = default_occupied_docs
 
     occupied_seats = set()
     my_seat: Optional[int] = None

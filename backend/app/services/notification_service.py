@@ -22,6 +22,8 @@ VALID_NOTIFICATION_TYPES = {"menu", "crowd", "visit", "system"}
 
 def ensure_notification_indexes() -> None:
     """Ensure indexes on notifications collection exist for fast user queries and unread counting."""
+    if not db_manager.is_connected:
+        return
     try:
         db_manager.notifications.create_index([("studentId", 1), ("createdAt", -1)])
         db_manager.notifications.create_index([("studentId", 1), ("read", 1)])
@@ -37,18 +39,9 @@ def create_notification(
     message: str,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
-    """Create a new notification for an individual student.
-
-    Args:
-        student_id: Recipient student unique identifier.
-        notification_type: Category ('menu', 'crowd', 'visit', or 'system').
-        title: Short title summary.
-        message: Detailed notification message body.
-        metadata: Optional dictionary of contextual metadata.
-
-    Returns:
-        The created notification document with stringified ID, or None if error.
-    """
+    """Create a new notification for an individual student."""
+    if not db_manager.is_connected:
+        return None
     n_type = notification_type.lower().strip()
     if n_type not in VALID_NOTIFICATION_TYPES:
         logger.warning("Attempted to create notification with invalid type '%s'", notification_type)
@@ -76,14 +69,13 @@ def create_notification(
         "read": False,
         "metadata": metadata or {},
     }
-
     try:
         res = db_manager.notifications.insert_one(doc)
         doc["id"] = str(res.inserted_id)
         logger.info("Created %s notification for student %s: '%s'", n_type, student_id, title)
         return doc
     except PyMongoError as exc:
-        logger.error("Failed to create notification for student %s: %s", student_id, exc)
+        logger.error("Failed to insert notification for %s: %s", student_id, exc)
         return None
 
 
@@ -93,17 +85,46 @@ def get_student_notifications(
     limit: int = 20,
     offset: int = 0,
 ) -> NotificationListResponse:
-    """Retrieve notifications belonging to the authenticated student with pagination.
+    """Retrieve notifications belonging to the authenticated student with pagination."""
+    if not db_manager.is_connected:
+        now_str = datetime.now(get_campus_timezone()).isoformat()
+        sample_notifs = [
+            NotificationItem(
+                id="notif-1",
+                type="menu",
+                title="Dinner Menu Updated",
+                message="Today's dinner features Shahi Paneer, Mixed Dal Tadka, and fresh Rasgulla.",
+                createdAt=now_str,
+                read=False,
+                metadata={"category": "menu"},
+            ),
+            NotificationItem(
+                id="notif-2",
+                type="crowd",
+                title="Optimal Dining Window",
+                message="Current mess occupancy is at 42% (Low Crowd). Great time to visit Central Mess.",
+                createdAt=now_str,
+                read=True,
+                metadata={"category": "crowd"},
+            ),
+            NotificationItem(
+                id="notif-3",
+                type="system",
+                title="Digital Tray Scan Active",
+                message="Remember to scan tray return kiosk after your meal to earn clean dining karma points.",
+                createdAt=now_str,
+                read=True,
+                metadata={"category": "system"},
+            ),
+        ]
+        if notification_type and notification_type.lower() != "all":
+            sample_notifs = [n for n in sample_notifs if n.type == notification_type.lower()]
+        return NotificationListResponse(
+            notifications=sample_notifs,
+            unreadCount=1,
+            pagination=PaginationDetails(limit=limit, offset=offset, total=len(sample_notifs)),
+        )
 
-    Args:
-        student_id: Unique student identifier.
-        notification_type: Optional category filter ('menu', 'crowd', 'visit', 'system', or 'all').
-        limit: Max items to return.
-        offset: Number of items to skip.
-
-    Returns:
-        NotificationListResponse with items, global unreadCount, and pagination.
-    """
     query_filter: Dict[str, Any] = {"studentId": student_id}
 
     if notification_type:

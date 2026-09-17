@@ -32,14 +32,16 @@ def get_student_settings(student_id: str) -> SettingsResponse:
         HTTPException(500): If database access fails.
     """
     settings = get_settings()
-    try:
-        student = db_manager.students.find_one(
-            {"studentId": student_id},
-            projection={"studentId": 1, "name": 1, "preferences": 1, "isActive": 1, "_id": 0},
-        )
-    except (PyMongoError, Exception) as exc:
-        logger.warning("Database query failed while fetching settings for %s: %s. Using fallback.", student_id, exc)
-        student = None
+    student = None
+    if db_manager.is_connected:
+        try:
+            student = db_manager.students.find_one(
+                {"studentId": student_id},
+                projection={"studentId": 1, "name": 1, "preferences": 1, "isActive": 1, "_id": 0},
+            )
+        except (PyMongoError, Exception) as exc:
+            logger.warning("Database query failed while fetching settings for %s: %s. Using fallback.", student_id, exc)
+            student = None
 
     if not student:
         from app.services.auth_service import get_student_by_id

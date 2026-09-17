@@ -77,6 +77,9 @@ def get_student_current_active_visit(
     Returns:
         CurrentVisitResponse with active=True and details, or active=False and visit=None.
     """
+    if not db_manager.is_connected:
+        return CurrentVisitResponse(active=False, visit=None)
+
     try:
         cursor = db_manager.occupancy.find(
             {
@@ -305,6 +308,12 @@ def get_student_visit_history(
         "studentId": student_id,
         "status": {"$in": ["completed", "expired"]},
     }
+
+    if not db_manager.is_connected:
+        return VisitHistoryResponse(
+            visits=[],
+            pagination=PaginationDetails(limit=limit, offset=offset, total=0),
+        )
 
     try:
         total_count = db_manager.occupancy.count_documents(filter_query)

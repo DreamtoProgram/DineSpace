@@ -56,18 +56,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoutBtn.addEventListener('click', () => Auth.logout());
   }
 
-  // Load User Info
+  // Load User Info (Instant paint from cache)
+  const storedUser = Auth.getUser();
+  if (storedUser) {
+    if (userNameEl) userNameEl.textContent = storedUser.name || 'Student';
+    if (userRoleEl) userRoleEl.textContent = `${storedUser.studentId || 'STU1042'} | Central Mess`;
+  }
+
   if (Auth.isAuthenticated()) {
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        if (userNameEl) userNameEl.textContent = me.student.name || 'Kunal Kumar Singh';
-        if (userRoleEl) userRoleEl.textContent = `${me.student.studentId} | Campus`;
+    API.getMe().then(me => {
+      const student = me.student || (me.studentId ? me : null);
+      if (student) {
+        Auth.setUser(student);
+        if (userNameEl) userNameEl.textContent = student.name || 'Student';
+        if (userRoleEl) userRoleEl.textContent = `${student.studentId} | Central Mess`;
       }
-    } catch (e) {
-      const stored = Auth.getUser();
-      if (stored && userNameEl) userNameEl.textContent = stored.name || 'Kunal Kumar Singh';
-    }
+    }).catch(() => {});
   }
 
   // Generate Fallback Seat Map Data if Offline
@@ -257,6 +261,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Initial Load
+  // Instant render (0ms visual delay)
+  currentSeatsData = generateFallbackSeatMap();
+  renderMetrics();
+  renderGrids();
+
+  // Initial Background Load
   loadSeats();
 });

@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 def ensure_occupancy_indexes() -> None:
     """Ensure database indexes on occupancy status and active seat uniqueness exist in MongoDB."""
+    if not db_manager.is_connected:
+        return
     try:
         # Fast counting of active status
         db_manager.occupancy.create_index("status")
@@ -41,7 +43,9 @@ def ensure_occupancy_indexes() -> None:
 
 
 def get_active_occupancy_count() -> int:
-    """Count total currently occupied seats in MongoDB."""
+    """Count total currently occupied seats with instant offline fallback."""
+    if not db_manager.is_connected:
+        return 42
     try:
         return db_manager.occupancy.count_documents({"status": "occupied"})
     except (PyMongoError, Exception) as exc:

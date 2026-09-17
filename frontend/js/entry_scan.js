@@ -26,17 +26,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoutBtn.addEventListener('click', () => Auth.logout());
   }
 
-  // Load User Info
+  // Load User Info (Instant paint from cache)
+  const cachedUser = Auth.getUser();
+  if (cachedUser) {
+    if (userNameEl) userNameEl.textContent = cachedUser.name || 'Student';
+    if (userRoleEl) userRoleEl.textContent = `${cachedUser.studentId || 'STU1042'} | Central Mess`;
+  }
+
   if (Auth.isAuthenticated()) {
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        if (userNameEl) userNameEl.textContent = me.student.name || 'Kunal Kumar Singh';
-        if (userRoleEl) userRoleEl.textContent = `${me.student.studentId} | CSE`;
+    API.getMe().then(me => {
+      const student = me.student || (me.studentId ? me : null);
+      if (student) {
+        Auth.setUser(student);
+        if (userNameEl) userNameEl.textContent = student.name || 'Student';
+        if (userRoleEl) userRoleEl.textContent = `${student.studentId} | Central Mess`;
       }
-    } catch (e) {
-      console.warn('Could not fetch user profile:', e);
-    }
+    }).catch(() => {});
   }
 
   let isScanning = false;

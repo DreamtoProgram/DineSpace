@@ -44,104 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 1. Check Authentication & Load User Profile
-  if (Auth.isAuthenticated()) {
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        const student = me.student;
-        const firstName = student.name ? student.name.split(' ')[0] : 'Student';
-        const greeting = getGreeting();
-        greetingText.textContent = `${greeting}, ${firstName}`;
-        userNameEl.textContent = student.name || 'Student';
-        userRoleEl.textContent = `${student.studentId} | Campus`;
-      }
-    } catch (e) {
-      console.warn('Could not fetch student profile:', e);
-    }
-  }
-
-  // 2. Fetch and Update Status
-  async function updateStatus() {
-    try {
-      const status = await API.getStatus();
-      if (!status) return;
-
-      const rate = status.occupancyRate || 0;
-      const occupied = status.occupancyCount || 0;
-      const available = status.availableSeats ?? (100 - occupied);
-      const level = status.crowdLevel || 'Moderate';
-
-      // Update Gauge
-      crowdPercentEl.textContent = `${rate}%`;
-      const offset = CIRCUMFERENCE - (rate / 100) * CIRCUMFERENCE;
-      gaugeCircle.style.strokeDashoffset = offset;
-
-      // Update numbers
-      seatsAvailableEl.textContent = available;
-      seatsOccupiedEl.textContent = occupied;
-
-      // Update Crowd Level Badge
-      if (level === 'Low') {
-        crowdLevelBadge.textContent = 'Low Crowd';
-        crowdLevelBadge.className = 'text-base font-bold text-emerald-400';
-        crowdSubtitle.textContent = 'Plenty of seats available, ideal time to dine!';
-      } else if (level === 'High') {
-        crowdLevelBadge.textContent = 'Peak Rush';
-        crowdLevelBadge.className = 'text-base font-bold text-red-400';
-        crowdSubtitle.textContent = 'Heavy rush! Expect brief waiting at entrance.';
-      } else {
-        crowdLevelBadge.textContent = 'Moderate Crowd';
-        crowdLevelBadge.className = 'text-base font-bold text-[#FFA048]';
-        crowdSubtitle.textContent = "Some rush, but you'll find a seat!";
-      }
-
-      // Update Timestamp
-      const now = new Date();
-      updatedAtText.textContent = `Updated ${formatTime(now)}`;
-
-    } catch (err) {
-      // Graceful fallback realistic metrics if backend is offline
-      const rate = 37;
-      const occupied = 37;
-      const available = 63;
-      if (crowdPercentEl) crowdPercentEl.textContent = `${rate}%`;
-      if (gaugeCircle) {
-        const offset = CIRCUMFERENCE - (rate / 100) * CIRCUMFERENCE;
-        gaugeCircle.style.strokeDashoffset = offset;
-      }
-      if (seatsAvailableEl) seatsAvailableEl.textContent = available;
-      if (seatsOccupiedEl) seatsOccupiedEl.textContent = occupied;
-      if (crowdLevelBadge) {
-        crowdLevelBadge.textContent = 'Moderate Crowd';
-        crowdLevelBadge.className = 'text-base font-bold text-[#FFA048]';
-      }
-      if (crowdSubtitle) crowdSubtitle.textContent = "Some rush, but you'll find a seat!";
-      const now = new Date();
-      if (updatedAtText) updatedAtText.textContent = `Updated ${formatTime(now)}`;
-    }
-  }
-
-  // 3. Check Current Active Visit
-  async function checkActiveVisit() {
-    if (!Auth.isAuthenticated()) return;
-    try {
-      const res = await API.getCurrentVisit();
-      if (res && res.hasActiveVisit && res.visit) {
-        visitEmptyState.classList.add('hidden');
-        visitActiveState.classList.remove('hidden');
-        activeSeatNumber.textContent = `#${res.visit.seatNumber}`;
-        const mins = res.visit.elapsedMinutes || 0;
-        activeDuration.textContent = `${mins.toString().padStart(2, '0')} min`;
-      } else {
-        visitEmptyState.classList.remove('hidden');
-        visitActiveState.classList.add('hidden');
-      }
-    } catch (e) {
-      // Keep empty state
-      visitEmptyState.classList.remove('hidden');
-      visitActiveState.classList.add('hidden');
-    }
+  // Helper: Greeting by hour
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   }
 
   // Helper: Time Formatter
@@ -155,12 +63,126 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${hours}:${strMinutes} ${ampm}`;
   }
 
-  // Helper: Greeting by hour
-  function getGreeting() {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+  function getDefaultStatus() {
+    return {
+      occupancyRate: 42,
+      occupancyCount: 42,
+      availableSeats: 58,
+      crowdLevel: 'Low'
+    };
+  }
+
+  function renderUserProfile(student) {
+    if (!student) return;
+    const firstName = student.name ? student.name.split(' ')[0] : 'Student';
+    const greeting = getGreeting();
+    if (greetingText) greetingText.textContent = `${greeting}, ${firstName}`;
+    if (userNameEl) userNameEl.textContent = student.name || 'Student';
+    if (userRoleEl) userRoleEl.textContent = `${student.studentId || 'STU1042'} | Central Mess`;
+  }
+
+  function renderStatusUI(status) {
+    if (!status) return;
+    const rate = status.occupancyRate ?? status.occupancyPercentage ?? 42;
+    const occupied = status.occupancyCount ?? status.occupiedSeats ?? 42;
+    const available = status.availableSeats ?? Math.max(0, 100 - occupied);
+    const level = status.crowdLevel || (rate > 80 ? 'Peak Rush' : (rate >= 50 ? 'Moderate' : 'Low'));
+
+    if (crowdPercentEl) crowdPercentEl.textContent = `${rate}%`;
+    if (gaugeCircle) {
+      const offset = CIRCUMFERENCE - (rate / 100) * CIRCUMFERENCE;
+      gaugeCircle.style.strokeDashoffset = offset;
+    }
+
+    if (seatsAvailableEl) seatsAvailableEl.textContent = available;
+    if (seatsOccupiedEl) seatsOccupiedEl.textContent = occupied;
+
+    if (crowdLevelBadge && crowdSubtitle) {
+      if (level === 'Low') {
+        crowdLevelBadge.textContent = 'Low Crowd';
+        crowdLevelBadge.className = 'text-base font-bold text-emerald-400';
+        crowdSubtitle.textContent = 'Plenty of seats available, ideal time to dine!';
+      } else if (level === 'Peak Rush' || level === 'High') {
+        crowdLevelBadge.textContent = 'Peak Rush';
+        crowdLevelBadge.className = 'text-base font-bold text-red-400';
+        crowdSubtitle.textContent = 'Heavy rush! Expect brief waiting at entrance.';
+      } else {
+        crowdLevelBadge.textContent = 'Moderate Crowd';
+        crowdLevelBadge.className = 'text-base font-bold text-[#FFA048]';
+        crowdSubtitle.textContent = "Some rush, but you'll find a seat!";
+      }
+    }
+
+    if (updatedAtText) {
+      updatedAtText.textContent = `Updated ${formatTime(new Date())}`;
+    }
+  }
+
+  // 1. Instant Paint: Render local state immediately (0ms visual latency)
+  const cachedUser = Auth.getUser();
+  if (cachedUser) {
+    renderUserProfile(cachedUser);
+  } else if (!Auth.isAuthenticated() && !window.location.protocol.startsWith('file')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const cachedStatusStr = localStorage.getItem('dinespace_cached_status');
+  if (cachedStatusStr) {
+    try {
+      renderStatusUI(JSON.parse(cachedStatusStr));
+    } catch (e) {
+      renderStatusUI(getDefaultStatus());
+    }
+  } else {
+    renderStatusUI(getDefaultStatus());
+  }
+
+  // 2. Fetchers for Parallel Synchronization
+  async function fetchUserProfile() {
+    if (!Auth.isAuthenticated()) return;
+    try {
+      const me = await API.getMe();
+      const student = me.student || (me.studentId ? me : null);
+      if (student) {
+        Auth.setUser(student);
+        renderUserProfile(student);
+      }
+    } catch (e) {
+      // Keep cached profile, never disrupt user session
+    }
+  }
+
+  async function updateStatus() {
+    try {
+      const status = await API.getStatus();
+      if (status) {
+        localStorage.setItem('dinespace_cached_status', JSON.stringify(status));
+        renderStatusUI(status);
+      }
+    } catch (err) {
+      // Keep existing render or fallback
+    }
+  }
+
+  async function checkActiveVisit() {
+    if (!Auth.isAuthenticated()) return;
+    try {
+      const res = await API.getCurrentVisit();
+      if (res && (res.hasActiveVisit || res.active) && res.visit) {
+        if (visitEmptyState) visitEmptyState.classList.add('hidden');
+        if (visitActiveState) visitActiveState.classList.remove('hidden');
+        if (activeSeatNumber) activeSeatNumber.textContent = `#${res.visit.seatNumber}`;
+        const mins = res.visit.elapsedMinutes ?? res.visit.durationMinutes ?? 0;
+        if (activeDuration) activeDuration.textContent = `${mins.toString().padStart(2, '0')} min`;
+      } else {
+        if (visitEmptyState) visitEmptyState.classList.remove('hidden');
+        if (visitActiveState) visitActiveState.classList.add('hidden');
+      }
+    } catch (e) {
+      if (visitEmptyState) visitEmptyState.classList.remove('hidden');
+      if (visitActiveState) visitActiveState.classList.add('hidden');
+    }
   }
 
   // Refresh button click
@@ -173,11 +195,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Initial Load
-  await updateStatus();
-  await checkActiveVisit();
+  // 3. Parallel Background Initial Fetch
+  Promise.allSettled([
+    fetchUserProfile(),
+    updateStatus(),
+    checkActiveVisit()
+  ]);
 
-  // Periodic Polling every 4 seconds (per README)
-  setInterval(updateStatus, 4000);
-  setInterval(checkActiveVisit, 10000);
+  // Periodic Background Polling
+  setInterval(updateStatus, 5000);
+  setInterval(checkActiveVisit, 12000);
 });

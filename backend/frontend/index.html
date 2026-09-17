@@ -4,12 +4,8 @@
   <meta charset="UTF-8" />
   <title>DineSpace — Redirecting...</title>
   <script>
-    const token = localStorage.getItem('dinespace_jwt_token');
-    if (token) {
-      window.location.href = 'home.html';
-    } else {
-      window.location.href = 'login.html';
-    }
+    const token = localStorage.getItem('dinespace_jwt_token') || localStorage.getItem('dinespace_token');
+    window.location.replace(token ? 'home.html' : 'login.html');
   </script>
 </head>
 <body style="background-color:#070B11; color:white; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">

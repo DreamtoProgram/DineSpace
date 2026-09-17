@@ -5,8 +5,7 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Auth check (allow file preview)
-  const token = localStorage.getItem('dinespace_token');
-  if (!token && !window.location.protocol.startsWith('file')) {
+  if (!Auth.isAuthenticated() && !window.location.protocol.startsWith('file')) {
     window.location.href = 'login.html';
     return;
   }

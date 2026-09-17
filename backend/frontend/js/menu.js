@@ -40,18 +40,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoutBtn.addEventListener('click', () => Auth.logout());
   }
 
-  // Load User Info
+  // Instant paint user info from cache
+  const storedUser = Auth.getUser();
+  if (storedUser) {
+    if (userNameEl) userNameEl.textContent = storedUser.name || 'Student';
+    if (userRoleEl) userRoleEl.textContent = `${storedUser.studentId || 'STU1042'} | Central Mess`;
+  }
+
   if (Auth.isAuthenticated()) {
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        if (userNameEl) userNameEl.textContent = me.student.name || 'Kunal Kumar Singh';
-        if (userRoleEl) userRoleEl.textContent = `${me.student.studentId} | Campus`;
+    API.getMe().then(me => {
+      const student = me.student || (me.studentId ? me : null);
+      if (student) {
+        Auth.setUser(student);
+        if (userNameEl) userNameEl.textContent = student.name || 'Student';
+        if (userRoleEl) userRoleEl.textContent = `${student.studentId} | Central Mess`;
       }
-    } catch (e) {
-      const stored = Auth.getUser();
-      if (stored && userNameEl) userNameEl.textContent = stored.name || 'Kunal Kumar Singh';
-    }
+    }).catch(() => {});
   }
 
   // Comprehensive Menu Dataset (Fallback & Enhancements)

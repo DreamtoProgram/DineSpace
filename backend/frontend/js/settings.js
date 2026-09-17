@@ -74,27 +74,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 5000);
   }
 
-  // Load User Data & Settings
+  // Load User Data & Settings (Instant paint from cache)
   async function loadProfile() {
     let student = Auth.getUser();
 
-    try {
-      const me = await API.getMe();
-      if (me && me.student) {
-        student = me.student;
-      }
-    } catch (e) {
-      // offline fallback
-    }
-
     if (student) {
-      const name = student.name || 'Kunal Kumar Singh';
-      const id = student.studentId || 'P132-NNK';
+      const name = student.name || 'Student';
+      const id = student.studentId || 'STU1042';
       if (userNameEl) userNameEl.textContent = name;
       if (dropdownUserName) dropdownUserName.textContent = name;
       if (profileFullName) profileFullName.textContent = name;
       if (profileStudentId) profileStudentId.textContent = `Student ID: ${id}`;
-      if (userRoleEl) userRoleEl.textContent = `${id} | Campus`;
+      if (userRoleEl) userRoleEl.textContent = `${id} | Central Mess`;
+    }
+
+    try {
+      const me = await API.getMe();
+      const resolved = me.student || (me.studentId ? me : null);
+      if (resolved) {
+        student = resolved;
+        Auth.setUser(student);
+        const name = student.name || 'Student';
+        const id = student.studentId || 'STU1042';
+        if (userNameEl) userNameEl.textContent = name;
+        if (dropdownUserName) dropdownUserName.textContent = name;
+        if (profileFullName) profileFullName.textContent = name;
+        if (profileStudentId) profileStudentId.textContent = `Student ID: ${id}`;
+        if (userRoleEl) userRoleEl.textContent = `${id} | Central Mess`;
+      }
+    } catch (e) {
+      // offline fallback
     }
 
     // Try API.getSettings()

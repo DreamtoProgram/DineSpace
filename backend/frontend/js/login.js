@@ -63,44 +63,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const loginRes = await API.login(studentId, password);
-      // Fetch user profile
-      const meRes = await API.getMe();
+      const student = loginRes.student || {
+        studentId,
+        name: studentId === 'P132-NNK' ? 'Kunal Kumar Singh' : (studentId === 'STU1042' ? 'Sarah Chen' : 'Student (' + studentId + ')')
+      };
+      Auth.setUser(student);
       
       // Flash success state
       submitBtn.classList.remove('btn-primary');
       submitBtn.classList.add('bg-emerald-600');
-      submitText.textContent = 'Welcome, ' + (meRes.student ? meRes.student.name : studentId) + '!';
+      submitText.textContent = 'Welcome, ' + (student.name || studentId) + '!';
       
       setTimeout(() => {
         // Navigate to Home Dashboard
         window.location.href = 'home.html';
-      }, 700);
+      }, 400);
 
     } catch (err) {
-      // If network error / backend offline / DB error, gracefully fall back to demo student session
+      // If network error / backend offline / DB error or master password, gracefully enter student session
       const isDbOrNetworkIssue =
         !err.status ||
         err.status >= 500 ||
         err.message?.toLowerCase().includes('database') ||
         err.message?.toLowerCase().includes('unavailable') ||
         err.message?.toLowerCase().includes('failed to fetch') ||
+        err.name === 'AbortError' ||
         err.name === 'TypeError';
 
       if (isDbOrNetworkIssue || password === 'DineSpace2026!') {
         const studentName = (studentId === 'P132-NNK' ? 'Kunal Kumar Singh' : (studentId === 'STU1042' ? 'Sarah Chen' : 'Student (' + studentId + ')'));
         const demoUser = {
-          studentId: studentId || 'P132-NNK',
+          studentId: studentId || 'STU1042',
           name: studentName,
           department: 'Computer Science & Engineering'
         };
-        Auth.setToken('demo_token_' + Date.now());
+        Auth.setToken('demo_token_' + (studentId || 'STU1042') + '_' + Date.now());
         Auth.setUser(demoUser);
         submitBtn.classList.remove('btn-primary');
         submitBtn.classList.add('bg-emerald-600');
         submitText.textContent = 'Welcome, ' + demoUser.name + '!';
         setTimeout(() => {
           window.location.href = 'home.html';
-        }, 700);
+        }, 400);
         return;
       }
       setLoading(false);
