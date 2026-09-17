@@ -37,8 +37,10 @@
   <style>
     /* Outer glowing card matching designed_pages/page_5.png */
     .visit-outer-card {
-      width: 580px;
-      height: 636px;
+      max-width: 580px;
+      width: 100%;
+      height: auto;
+      min-height: 520px;
       background: rgba(13, 19, 28, 0.88);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 94, 30, 0.32);
@@ -53,8 +55,10 @@
 
     /* Inner seat number card (404px wide x 126px high) */
     .seat-number-box {
-      width: 404px;
-      height: 126px;
+      max-width: 404px;
+      width: 100%;
+      height: auto;
+      min-height: 110px;
       background: rgba(22, 16, 17, 0.55);
       border: 1px solid rgba(255, 94, 30, 0.28);
       box-shadow: inset 0 0 20px -8px rgba(255, 94, 30, 0.08);
@@ -65,9 +69,9 @@
 <body class="bg-[#070B11] text-white min-h-screen flex overflow-x-hidden selection:bg-[#FF5E1E] selection:text-white">
 
   <!-- ========================================================================= -->
-  <!-- LEFT SIDEBAR                                                              -->
+  <!-- LEFT SIDEBAR (Desktop)                                                    -->
   <!-- ========================================================================= -->
-  <aside class="w-[292px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex flex-col justify-between p-6 min-h-screen z-20">
+  <aside class="hidden md:flex w-[292px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex-col justify-between p-6 min-h-screen z-20">
     
     <!-- Top Brand & Navigation -->
     <div class="space-y-8">
@@ -185,8 +189,39 @@
   <!-- ========================================================================= -->
   <main class="flex-1 flex flex-col min-h-screen overflow-y-auto">
     
+    <!-- Mobile Top App Bar (md:hidden) -->
+    <div class="md:hidden flex items-center justify-between px-4 py-3 bg-[#0A0F18]/95 border-b border-white/5 sticky top-0 z-40 backdrop-blur-md">
+      <a href="home.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#221511] border border-orange-500/20 flex-shrink-0">
+          <img src="assets/images/login_badge.png" alt="DineSpace" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex items-baseline tracking-tight">
+          <span class="text-base font-bold text-white">Dine</span>
+          <span class="text-base font-bold text-[#FF5E1E]">Space</span>
+        </div>
+      </a>
+      
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 text-[11px] text-[#8B9BB4] bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-medium text-white">Central Mess</span>
+        </div>
+        
+        <a href="notifications.html" class="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-300 relative">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FF5E1E]"></span>
+        </a>
+
+        <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+          <img src="assets/images/user_avatar.png" alt="Profile" class="w-full h-full object-cover" />
+        </a>
+      </div>
+    </div>
+
     <!-- Top Header Bar (Height: 84px matching designed_pages/page_5.png) -->
-    <header class="h-[84px] border-b border-white/5 px-10 flex items-center justify-between bg-[#070B11]/90 backdrop-blur-md sticky top-0 z-30">
+    <header class="hidden md:flex h-[84px] border-b border-white/5 px-10 items-center justify-between bg-[#070B11]/90 backdrop-blur-md sticky top-0 z-30">
       
       <!-- Search Input -->
       <div class="relative w-84">
@@ -240,23 +275,23 @@
     </header>
 
     <!-- Page Content Container -->
-    <div class="px-14 pt-8 pb-8 flex-1 flex flex-col justify-between max-w-[1140px]">
+    <div class="px-4 sm:px-8 md:px-14 pt-4 sm:pt-8 pb-28 md:pb-8 flex-1 flex flex-col justify-between max-w-[1140px]">
       
       <!-- Titles (No Back button in designed_pages/page_5.png) -->
       <div class="space-y-1">
-        <h1 class="text-[34px] font-extrabold text-white tracking-tight leading-tight">My Visit</h1>
-        <p class="text-sm text-[#8B9BB4] font-normal">Here's your current dining session.</p>
+        <h1 class="text-2xl sm:text-[34px] font-extrabold text-white tracking-tight leading-tight">My Visit</h1>
+        <p class="text-xs sm:text-sm text-[#8B9BB4] font-normal">Here's your current dining session.</p>
       </div>
 
       <!-- Main Center Glowing Card (580px wide by 636px high matching page_5.png) -->
       <div class="flex flex-col items-center justify-center my-auto py-2">
-        <div class="visit-outer-card p-8 flex flex-col justify-between relative">
+        <div class="visit-outer-card p-5 sm:p-8 flex flex-col justify-between relative">
           
           <!-- Top Section: Dining Hall Header -->
           <div>
-            <div class="flex items-center justify-center gap-4 py-1">
+            <div class="flex items-center justify-center gap-3 sm:gap-4 py-1">
               <!-- Building Facade Icon in Orange #FF5E1E -->
-              <svg class="w-9 h-9 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-8 h-8 sm:w-9 sm:h-9 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 10.5 L14 3.5 L25 10.5"/>
                 <rect x="4.5" y="10.5" width="19" height="13.5" rx="1"/>
                 <rect x="7.5" y="13.5" width="3" height="3" rx="0.5"/>
@@ -265,13 +300,13 @@
                 <line x1="2" y1="24" x2="26" y2="24"/>
               </svg>
               <div>
-                <h3 id="dining-hall-title" class="text-lg font-bold text-white tracking-tight leading-snug">Central Mess</h3>
-                <p class="text-xs text-[#8B9BB4] font-normal">Dining Hall</p>
+                <h3 id="dining-hall-title" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">Central Mess</h3>
+                <p class="text-[11px] sm:text-xs text-[#8B9BB4] font-normal">Dining Hall</p>
               </div>
             </div>
 
             <!-- Top Divider -->
-            <div class="w-full h-[1px] bg-white/5 mt-5"></div>
+            <div class="w-full h-[1px] bg-white/5 mt-4 sm:mt-5"></div>
           </div>
 
           <!-- Middle Section: Your Seat & Status -->
@@ -281,35 +316,35 @@
             </span>
 
             <!-- Seat Box (404px wide by 126px high matching page_5.png) -->
-            <div class="seat-number-box flex items-center justify-center">
-              <span id="seat-number-display" class="text-[68px] font-extrabold text-[#FF5E1E] leading-none tracking-tight">
+            <div class="seat-number-box flex items-center justify-center py-4">
+              <span id="seat-number-display" class="text-5xl sm:text-[68px] font-extrabold text-[#FF5E1E] leading-none tracking-tight">
                 #24
               </span>
             </div>
 
             <!-- Glowing Emerald Green Status Pill: "● You're dining" -->
-            <div class="mt-5 px-6 py-2 rounded-full bg-[#0A2616] border border-[#10B981]/35 flex items-center gap-2.5 shadow-sm">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></span>
-              <span class="text-sm font-medium text-[#A7F3D0] tracking-wide">You're dining</span>
+            <div class="mt-4 sm:mt-5 px-5 sm:px-6 py-1.5 sm:py-2 rounded-full bg-[#0A2616] border border-[#10B981]/35 flex items-center gap-2 sm:gap-2.5 shadow-sm">
+              <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></span>
+              <span class="text-xs sm:text-sm font-medium text-[#A7F3D0] tracking-wide">You're dining</span>
             </div>
 
             <!-- Middle Divider -->
-            <div class="w-full h-[1px] bg-white/5 mt-6"></div>
+            <div class="w-full h-[1px] bg-white/5 mt-5 sm:mt-6"></div>
           </div>
 
           <!-- Lower Section: Entered Time + Scan Tray Return Action Button -->
-          <div class="space-y-4">
+          <div class="space-y-3 sm:space-y-4">
             
             <!-- Entry Time Detail Row -->
-            <div class="flex items-center gap-3.5 px-2">
+            <div class="flex items-center gap-3 px-2">
               <!-- Clock SVG Icon in Orange #FF5E1E -->
-              <svg class="w-8 h-8 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="14" cy="14" r="11"/>
                 <polyline points="14 8.5 14 14 18 17.5"/>
               </svg>
               <div>
                 <div class="text-[11px] text-[#8B9BB4] font-normal">Entered</div>
-                <div id="entered-time-display" class="text-base font-bold text-white tracking-tight">10:26 PM</div>
+                <div id="entered-time-display" class="text-sm sm:text-base font-bold text-white tracking-tight">10:26 PM</div>
               </div>
             </div>
 
@@ -317,12 +352,12 @@
             <a 
               href="tray_return.html" 
               id="scan-tray-btn" 
-              class="w-full h-[84px] rounded-[24px] bg-[#FF5E1E] hover:bg-[#EA4C10] px-5 py-4 flex items-center justify-between transition-all cursor-pointer shadow-lg shadow-orange-500/25 group"
+              class="w-full min-h-[72px] sm:h-[84px] rounded-2xl sm:rounded-[24px] bg-[#FF5E1E] hover:bg-[#EA4C10] px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between transition-all cursor-pointer shadow-lg shadow-orange-500/25 group"
             >
               <!-- Left: QR Icon badge + texts -->
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-[#26150D]/80 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <div class="flex items-center gap-3 sm:gap-4">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#26150D]/80 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 8V5a1 1 0 0 1 1-1h3"/>
                     <path d="M16 4h3a1 1 0 0 1 1 1v3"/>
                     <path d="M4 16v3a1 1 0 0 0 1 1h3"/>
@@ -334,14 +369,14 @@
                   </svg>
                 </div>
                 <div class="text-left">
-                  <div class="text-base font-bold text-[#0F172A] tracking-tight leading-tight">Scan Tray Return</div>
-                  <div class="text-xs text-[#334155] font-medium mt-0.5">Finish your meal and free your seat.</div>
+                  <div class="text-sm sm:text-base font-bold text-[#0F172A] tracking-tight leading-tight">Scan Tray Return</div>
+                  <div class="text-[11px] sm:text-xs text-[#334155] font-medium mt-0.5">Finish your meal and free your seat.</div>
                 </div>
               </div>
 
               <!-- Right: Circle Arrow Button -->
-              <div class="w-12 h-12 rounded-full bg-[#2E1408]/40 group-hover:bg-[#2E1408]/60 flex items-center justify-center text-white transition-all flex-shrink-0">
-                <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#2E1408]/40 group-hover:bg-[#2E1408]/60 flex items-center justify-center text-white transition-all flex-shrink-0">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <line x1="5" y1="12" x2="19" y2="12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></line>
                   <polyline points="12 5 19 12 12 19" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
                 </svg>
@@ -353,12 +388,12 @@
         </div>
 
         <!-- Bottom Quote below Card (Matching page_5.png) -->
-        <div class="mt-8 flex items-center justify-center gap-4 text-center">
-          <div class="w-16 h-[1px] bg-white/10"></div>
-          <p class="font-serif-quote italic text-sm text-gray-300 tracking-wide">
+        <div class="mt-6 sm:mt-8 flex items-center justify-center gap-4 text-center">
+          <div class="w-12 sm:w-16 h-[1px] bg-white/10"></div>
+          <p class="font-serif-quote italic text-xs sm:text-sm text-gray-300 tracking-wide">
             “Good Food Brighter Days”
           </p>
-          <div class="w-16 h-[1px] bg-white/10"></div>
+          <div class="w-12 sm:w-16 h-[1px] bg-white/10"></div>
         </div>
 
       </div>
@@ -367,6 +402,43 @@
       <div class="h-2"></div>
 
     </div>
+
+    <!-- Mobile Bottom App Navigation (md:hidden) -->
+    <nav class="mobile-bottom-nav md:hidden flex items-center justify-around px-2">
+      <a href="home.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="seats.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 15v4m-4-4v4m-5 0h14"></path>
+        </svg>
+        <span>Seats</span>
+      </a>
+      <a href="entry_scan.html" class="flex flex-col items-center group -mt-2" title="Quick Scan">
+        <div class="mobile-scan-fab">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold text-[#FFA048] mt-0.5">Scan</span>
+      </a>
+      <a href="menu.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+        <span>Menu</span>
+      </a>
+      <a href="settings.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        <span>Profile</span>
+      </a>
+    </nav>
 
   </main>
 

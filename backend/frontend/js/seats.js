@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const div = document.createElement('div');
-      div.className = `seat-node h-10 rounded-xl flex flex-col items-center justify-center cursor-pointer relative group ${bgClass} ${borderClass}`;
+      div.className = `seat-node h-11 sm:h-10 rounded-xl flex flex-col items-center justify-center cursor-pointer relative group active:scale-95 transition-transform touch-manipulation select-none ${bgClass} ${borderClass}`;
       div.setAttribute('title', `Seat #${s.seatNumber} (${tooltipStatus})`);
 
       div.innerHTML = `

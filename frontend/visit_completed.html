@@ -37,7 +37,8 @@
   <style>
     /* Outer glowing card matching designed_pages/page_7.png */
     .completed-outer-card {
-      width: 632px;
+      max-width: 632px;
+      width: 100%;
       background: rgba(13, 19, 28, 0.88);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 94, 30, 0.32);
@@ -64,9 +65,9 @@
 <body class="bg-[#070B11] text-white min-h-screen flex overflow-x-hidden selection:bg-[#FF5E1E] selection:text-white">
 
   <!-- ========================================================================= -->
-  <!-- LEFT SIDEBAR                                                              -->
+  <!-- LEFT SIDEBAR (Desktop)                                                    -->
   <!-- ========================================================================= -->
-  <aside class="w-[292px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex flex-col justify-between p-6 min-h-screen z-20">
+  <aside class="hidden md:flex w-[292px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex-col justify-between p-6 min-h-screen z-20">
     
     <!-- Top Brand & Navigation -->
     <div class="space-y-8">
@@ -184,8 +185,39 @@
   <!-- ========================================================================= -->
   <main class="flex-1 flex flex-col min-h-screen overflow-y-auto">
     
+    <!-- Mobile Top App Bar (md:hidden) -->
+    <div class="md:hidden flex items-center justify-between px-4 py-3 bg-[#0A0F18]/95 border-b border-white/5 sticky top-0 z-40 backdrop-blur-md">
+      <a href="home.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#221511] border border-orange-500/20 flex-shrink-0">
+          <img src="assets/images/login_badge.png" alt="DineSpace" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex items-baseline tracking-tight">
+          <span class="text-base font-bold text-white">Dine</span>
+          <span class="text-base font-bold text-[#FF5E1E]">Space</span>
+        </div>
+      </a>
+      
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 text-[11px] text-[#8B9BB4] bg-white/[0.04] px-2.5 py-1 rounded-full border border-white/5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-medium text-white">Central Mess</span>
+        </div>
+        
+        <a href="notifications.html" class="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-300 relative">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FF5E1E]"></span>
+        </a>
+
+        <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+          <img src="assets/images/user_avatar.png" alt="Profile" class="w-full h-full object-cover" />
+        </a>
+      </div>
+    </div>
+
     <!-- Top Header Bar (Height: 84px matching designed_pages/page_7.png) -->
-    <header class="h-[84px] border-b border-white/5 px-10 flex items-center justify-between bg-[#070B11]/90 backdrop-blur-md sticky top-0 z-30">
+    <header class="hidden md:flex h-[84px] border-b border-white/5 px-10 items-center justify-between bg-[#070B11]/90 backdrop-blur-md sticky top-0 z-30">
       
       <!-- Search Input -->
       <div class="relative w-84">
@@ -239,7 +271,7 @@
     </header>
 
     <!-- Page Content Container -->
-    <div class="px-14 pt-8 pb-10 flex-1 flex flex-col justify-between max-w-[1200px]">
+    <div class="px-4 sm:px-8 md:px-14 pt-4 sm:pt-8 pb-28 md:pb-10 flex-1 flex flex-col justify-between max-w-[1200px]">
       
       <!-- Back Link (No outer heading in designed_pages/page_7.png) -->
       <div>
@@ -254,39 +286,39 @@
 
       <!-- Main Center Glowing Card (632px wide matching page_7.png) -->
       <div class="flex flex-col items-center justify-center my-auto py-1">
-        <div class="completed-outer-card p-10 flex flex-col items-center justify-between relative">
+        <div class="completed-outer-card p-5 sm:p-10 flex flex-col items-center justify-between relative">
           
           <!-- Top Green Glowing Circle with Mint Checkmark -->
           <div class="green-glow-circle flex items-center justify-center flex-shrink-0 mt-1">
-            <svg class="w-14 h-14" viewBox="0 0 52 52" fill="none">
+            <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 52 52" fill="none">
               <path d="M15 27 L23 35 L37 19" stroke="#86EFAC" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
 
           <!-- Titles Section inside Card -->
-          <div class="text-center mt-6 space-y-1.5">
-            <h1 class="text-[34px] font-bold text-white tracking-tight leading-tight">
+          <div class="text-center mt-5 sm:mt-6 space-y-1 sm:space-y-1.5">
+            <h1 class="text-2xl sm:text-[34px] font-bold text-white tracking-tight leading-tight">
               Visit Completed!
             </h1>
-            <p id="thanks-name" class="text-lg text-gray-200 font-normal">
+            <p id="thanks-name" class="text-base sm:text-lg text-gray-200 font-normal">
               Thanks, Kunal!
             </p>
-            <p class="text-base text-gray-300 font-normal leading-relaxed pt-1">
+            <p class="text-xs sm:text-base text-gray-300 font-normal leading-relaxed pt-1">
               Your seat <span id="completed-seat-num" class="text-[#FF5E1E] font-bold">#24</span> is now<br>
               available for another student.
             </p>
           </div>
 
           <!-- Divider Line -->
-          <div class="w-full h-[1px] bg-white/5 my-7"></div>
+          <div class="w-full h-[1px] bg-white/5 my-5 sm:my-7"></div>
 
           <!-- Summary Details List (4 Rows exactly matching page_7.png) -->
-          <div class="w-full space-y-5 px-3">
+          <div class="w-full space-y-4 sm:space-y-5 px-1 sm:px-3">
             
             <!-- Row 1: Dining Hall -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
               <!-- Building Facade Icon in Orange #FF5E1E -->
-              <svg class="w-8 h-8 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 28 28" fill="none" stroke="#FF5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 10.5 L14 3.5 L25 10.5"/>
                 <rect x="4.5" y="10.5" width="19" height="13.5" rx="1"/>
                 <rect x="7.5" y="13.5" width="3" height="3" rx="0.5"/>
@@ -295,48 +327,48 @@
                 <line x1="2" y1="24" x2="26" y2="24"/>
               </svg>
               <div>
-                <div class="text-xs text-[#8B9BB4] font-normal">Dining Hall</div>
-                <div id="dining-hall-name" class="text-base font-semibold text-white tracking-tight leading-tight">Central Mess</div>
+                <div class="text-[11px] sm:text-xs text-[#8B9BB4] font-normal">Dining Hall</div>
+                <div id="dining-hall-name" class="text-sm sm:text-base font-semibold text-white tracking-tight leading-tight">Central Mess</div>
               </div>
             </div>
 
             <!-- Row 2: Entered Time -->
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Clock Icon -->
-                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="9.5"/>
                   <polyline points="12 7.5 12 12 15.5 15"/>
                 </svg>
-                <span class="text-sm text-gray-300 font-normal">Entered</span>
+                <span class="text-xs sm:text-sm text-gray-300 font-normal">Entered</span>
               </div>
-              <span id="entered-time" class="text-base font-semibold text-white tracking-tight">10:26 PM</span>
+              <span id="entered-time" class="text-sm sm:text-base font-semibold text-white tracking-tight">10:26 PM</span>
             </div>
 
             <!-- Row 3: Exited Time -->
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Circle Arrow Icon -->
-                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="9.5"/>
                   <polyline points="12 8 16 12 12 16"/>
                   <line x1="8" y1="12" x2="16" y2="12"/>
                 </svg>
-                <span class="text-sm text-gray-300 font-normal">Exited</span>
+                <span class="text-xs sm:text-sm text-gray-300 font-normal">Exited</span>
               </div>
-              <span id="exited-time" class="text-base font-semibold text-white tracking-tight">10:44 PM</span>
+              <span id="exited-time" class="text-sm sm:text-base font-semibold text-white tracking-tight">10:44 PM</span>
             </div>
 
             <!-- Row 4: Visit Duration -->
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-3 sm:gap-4">
                 <!-- Hourglass Icon -->
-                <svg class="w-6 h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#FF5E1E] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#FF5E1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 2h14M5 22h14M6 2v5l5 5-5 5v5M18 2v5l-5 5 5 5v5"/>
                 </svg>
-                <span class="text-sm text-gray-300 font-normal">Visit Duration</span>
+                <span class="text-xs sm:text-sm text-gray-300 font-normal">Visit Duration</span>
               </div>
-              <span id="visit-duration" class="text-base font-semibold text-white tracking-tight">18 min</span>
+              <span id="visit-duration" class="text-sm sm:text-base font-semibold text-white tracking-tight">18 min</span>
             </div>
 
           </div>
@@ -344,10 +376,10 @@
           <!-- Primary CTA Button: Back to Home -->
           <a 
             href="home.html" 
-            class="w-full h-[58px] rounded-[20px] bg-[#FF5E1E] hover:bg-[#EA4C10] font-bold text-base text-[#111827] flex items-center justify-center gap-3 transition-all cursor-pointer shadow-lg shadow-orange-500/25 group mt-8"
+            class="w-full h-12 sm:h-[58px] rounded-xl sm:rounded-[20px] bg-[#FF5E1E] hover:bg-[#EA4C10] font-bold text-sm sm:text-base text-[#111827] flex items-center justify-center gap-2 sm:gap-3 transition-all cursor-pointer shadow-lg shadow-orange-500/25 group mt-6 sm:mt-8"
           >
             <span>Back to Home</span>
-            <svg class="w-5 h-5 text-[#111827] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#111827] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <line x1="5" y1="12" x2="19" y2="12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></line>
               <polyline points="12 5 19 12 12 19" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
             </svg>
@@ -360,6 +392,43 @@
       <div class="h-2"></div>
 
     </div>
+
+    <!-- Mobile Bottom App Navigation (md:hidden) -->
+    <nav class="mobile-bottom-nav md:hidden flex items-center justify-around px-2">
+      <a href="home.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="seats.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 15v4m-4-4v4m-5 0h14"></path>
+        </svg>
+        <span>Seats</span>
+      </a>
+      <a href="entry_scan.html" class="flex flex-col items-center group -mt-2" title="Quick Scan">
+        <div class="mobile-scan-fab">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold text-[#FFA048] mt-0.5">Scan</span>
+      </a>
+      <a href="menu.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+        <span>Menu</span>
+      </a>
+      <a href="settings.html" class="mobile-nav-item">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        <span>Profile</span>
+      </a>
+    </nav>
 
   </main>
 
