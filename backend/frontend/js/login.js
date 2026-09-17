@@ -27,13 +27,76 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Quick Demo Auto-Fill (Sarah Chen - STU1042)
+  // Quick Demo Profiles Registry
+  const DEMO_PROFILES = {
+    'STU1042': {
+      studentId: 'STU1042',
+      name: 'Sarah Chen',
+      department: 'Computer Science & Engineering',
+      passCode: 'PASS-8842',
+      defaultSeat: 24
+    },
+    'P132-NNK': {
+      studentId: 'P132-NNK',
+      name: 'Kunal Kumar Singh',
+      department: 'Computer Science & Engineering',
+      passCode: 'PASS-1042',
+      defaultSeat: 15
+    },
+    'STU1043': {
+      studentId: 'STU1043',
+      name: 'Alex Sharma',
+      department: 'Information Technology',
+      passCode: 'PASS-8843',
+      defaultSeat: 32
+    },
+    'STU1044': {
+      studentId: 'STU1044',
+      name: 'Rahul Singh',
+      department: 'Mechanical Engineering',
+      passCode: 'PASS-8844',
+      defaultSeat: 45
+    },
+    'STU9999': {
+      studentId: 'STU9999',
+      name: 'Inactive Student',
+      department: 'Campus Dining',
+      passCode: 'PASS-9999',
+      defaultSeat: 1
+    }
+  };
+
+  // Quick Demo Auto-Fill Buttons
+  function activateProfileButton(activeId) {
+    document.querySelectorAll('.demo-profile-btn').forEach(btn => {
+      const id = btn.getAttribute('data-student-id');
+      if (id === activeId) {
+        btn.className = 'demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-orange-500/20 text-[#FF5E1E] border border-orange-500/50 transition-all cursor-pointer shadow-sm';
+      } else {
+        btn.className = 'demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all cursor-pointer shadow-sm';
+      }
+    });
+  }
+
+  document.querySelectorAll('.demo-profile-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute('data-student-id');
+      studentIdInput.value = id;
+      passwordInput.value = 'DineSpace2026!';
+      hideError();
+      activateProfileButton(id);
+      studentIdInput.focus();
+    });
+  });
+
   if (demoFillBtn) {
     demoFillBtn.addEventListener('click', (e) => {
       e.preventDefault();
       studentIdInput.value = 'STU1042';
       passwordInput.value = 'DineSpace2026!';
       hideError();
+      activateProfileButton('STU1042');
       studentIdInput.focus();
     });
   }
@@ -63,10 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const loginRes = await API.login(studentId, password);
-      const student = loginRes.student || {
+      const matched = DEMO_PROFILES[studentId];
+      const student = loginRes.student || (matched ? {
+        studentId: matched.studentId,
+        name: matched.name,
+        department: matched.department,
+        passCode: matched.passCode,
+        defaultSeat: matched.defaultSeat
+      } : {
         studentId,
-        name: studentId === 'P132-NNK' ? 'Kunal Kumar Singh' : (studentId === 'STU1042' ? 'Sarah Chen' : 'Student (' + studentId + ')')
-      };
+        name: 'Student (' + studentId + ')',
+        department: 'Campus Mess'
+      });
       Auth.setUser(student);
       
       // Flash success state
@@ -91,17 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
         err.name === 'TypeError';
 
       if (isDbOrNetworkIssue || password === 'DineSpace2026!') {
-        const studentName = (studentId === 'P132-NNK' ? 'Kunal Kumar Singh' : (studentId === 'STU1042' ? 'Sarah Chen' : 'Student (' + studentId + ')'));
-        const demoUser = {
+        const profile = DEMO_PROFILES[studentId] || {
           studentId: studentId || 'STU1042',
-          name: studentName,
-          department: 'Computer Science & Engineering'
+          name: 'Student (' + (studentId || 'STU1042') + ')',
+          department: 'Computer Science & Engineering',
+          passCode: 'PASS-1042',
+          defaultSeat: 24
         };
-        Auth.setToken('demo_token_' + (studentId || 'STU1042') + '_' + Date.now());
-        Auth.setUser(demoUser);
+        Auth.setToken('demo_token_' + profile.studentId + '_' + Date.now());
+        Auth.setUser(profile);
         submitBtn.classList.remove('btn-primary');
         submitBtn.classList.add('bg-emerald-600');
-        submitText.textContent = 'Welcome, ' + demoUser.name + '!';
+        submitText.textContent = 'Welcome, ' + profile.name + '!';
         setTimeout(() => {
           window.location.href = 'home.html';
         }, 400);

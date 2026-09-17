@@ -175,14 +175,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeSeatNumber) activeSeatNumber.textContent = `#${res.visit.seatNumber}`;
         const mins = res.visit.elapsedMinutes ?? res.visit.durationMinutes ?? 0;
         if (activeDuration) activeDuration.textContent = `${mins.toString().padStart(2, '0')} min`;
-      } else {
-        if (visitEmptyState) visitEmptyState.classList.remove('hidden');
-        if (visitActiveState) visitActiveState.classList.add('hidden');
+        return;
       }
-    } catch (e) {
-      if (visitEmptyState) visitEmptyState.classList.remove('hidden');
-      if (visitActiveState) visitActiveState.classList.add('hidden');
+    } catch (e) {}
+
+    // Check session entry for offline / demo mode
+    const activeEntry = sessionStorage.getItem('dinespace_entry_success');
+    if (activeEntry) {
+      try {
+        const parsed = JSON.parse(activeEntry);
+        const seat = parsed.seatNumber || parsed.visit?.seatNumber;
+        if (seat) {
+          if (visitEmptyState) visitEmptyState.classList.add('hidden');
+          if (visitActiveState) visitActiveState.classList.remove('hidden');
+          if (activeSeatNumber) activeSeatNumber.textContent = `#${seat}`;
+          const entryIso = parsed.visit?.entryTime || parsed.entryTime;
+          let mins = 0;
+          if (entryIso) {
+            const diff = Date.now() - new Date(entryIso).getTime();
+            mins = Math.max(0, Math.floor(diff / 60000));
+          }
+          if (activeDuration) activeDuration.textContent = `${mins.toString().padStart(2, '0')} min`;
+          return;
+        }
+      } catch (e) {}
     }
+
+    if (visitEmptyState) visitEmptyState.classList.remove('hidden');
+    if (visitActiveState) visitActiveState.classList.add('hidden');
   }
 
   // Refresh button click

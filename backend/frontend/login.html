@@ -374,19 +374,47 @@ Please contact your mess administrator or email support@campus.edu to reset your
             </div>
           </button>
 
-          <!-- Administrator note & Demo Autofill -->
-          <div class="mt-6 text-center space-y-2.5">
+          <!-- Administrator note & Demo Quick Switch -->
+          <div class="mt-6 text-center space-y-3">
             <p class="text-xs text-[#8B9BB4]">
               New here? <a href="#" onclick="alert('Please contact your college dining administrator to register your student account.'); return false;" class="text-gray-300 hover:text-white underline underline-offset-2 transition-colors">Contact your mess administrator.</a>
             </p>
-            <div>
-              <button 
-                type="button" 
-                id="demo-fill-btn" 
-                class="inline-flex items-center gap-1.5 text-[11px] px-3 py-1 rounded-full bg-orange-500/10 text-[#FF5E1E] hover:bg-orange-500/20 border border-orange-500/25 transition-all cursor-pointer shadow-sm"
-              >
-                <span>⚡ Fill Demo: Sarah Chen (STU1042)</span>
-              </button>
+            <div class="space-y-1.5 pt-1">
+              <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Quick Switch Demo Profiles</div>
+              <div class="flex flex-wrap items-center justify-center gap-1.5">
+                <button 
+                  type="button" 
+                  data-student-id="STU1042"
+                  class="demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-orange-500/10 text-[#FF5E1E] hover:bg-orange-500/20 border border-orange-500/25 transition-all cursor-pointer shadow-sm"
+                  title="Sarah Chen - Computer Science & Engineering"
+                >
+                  <span>⚡ Sarah Chen (STU1042)</span>
+                </button>
+                <button 
+                  type="button" 
+                  data-student-id="P132-NNK"
+                  class="demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all cursor-pointer shadow-sm"
+                  title="Kunal Kumar Singh - Computer Science & Engineering"
+                >
+                  <span>⚡ Kunal Singh (P132-NNK)</span>
+                </button>
+                <button 
+                  type="button" 
+                  data-student-id="STU1043"
+                  class="demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all cursor-pointer shadow-sm"
+                  title="Alex Sharma - Information Technology"
+                >
+                  <span>⚡ Alex Sharma (STU1043)</span>
+                </button>
+                <button 
+                  type="button" 
+                  data-student-id="STU1044"
+                  class="demo-profile-btn inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border border-white/10 transition-all cursor-pointer shadow-sm"
+                  title="Rahul Singh - Mechanical Engineering"
+                >
+                  <span>⚡ Rahul Singh (STU1044)</span>
+                </button>
+              </div>
             </div>
           </div>
 

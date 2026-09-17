@@ -78,11 +78,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   function generateFallbackSeatMap() {
     const totalCapacity = 100;
     const occupiedIndices = new Set([
-      3, 4, 7, 9, 12, 15, 18, 20, 21, 24, // 24 is user's seat
+      3, 4, 7, 9, 12, 18, 20, 21,
       28, 30, 31, 35, 38, 41, 44, 49,
       52, 55, 59, 61, 64, 68, 70, 72,
       77, 80, 83, 85, 88, 91, 94, 96, 98, 99, 100
     ]);
+
+    // Check if the current user has scanned in during this session
+    let mySeat = null;
+    const activeEntry = sessionStorage.getItem('dinespace_entry_success');
+    if (activeEntry) {
+      try {
+        const parsed = JSON.parse(activeEntry);
+        const seat = parsed.seatNumber || parsed.visit?.seatNumber;
+        if (seat) {
+          mySeat = Number(seat);
+          occupiedIndices.add(mySeat);
+        }
+      } catch (e) {}
+    }
+
     const seats = [];
     for (let i = 1; i <= totalCapacity; i++) {
       seats.push({
@@ -91,13 +106,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    let nextAvail = null;
+    for (let i = 1; i <= totalCapacity; i++) {
+      if (!occupiedIndices.has(i)) {
+        nextAvail = i;
+        break;
+      }
+    }
+
     return {
       diningHall: 'Central Mess',
       capacity: totalCapacity,
       occupiedCount: occupiedIndices.size,
       availableCount: totalCapacity - occupiedIndices.size,
-      mySeat: 24,
-      nextAvailableSeat: 1,
+      mySeat: mySeat,
+      nextAvailableSeat: nextAvail || 1,
       seats: seats
     };
   }
@@ -108,6 +131,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await API.getSeats();
       if (data && data.seats && data.seats.length > 0) {
         currentSeatsData = data;
+        if (!currentSeatsData.mySeat) {
+          const activeEntry = sessionStorage.getItem('dinespace_entry_success');
+          if (activeEntry) {
+            try {
+              const parsed = JSON.parse(activeEntry);
+              currentSeatsData.mySeat = Number(parsed.seatNumber || parsed.visit?.seatNumber);
+            } catch (e) {}
+          }
+        }
       } else {
         currentSeatsData = generateFallbackSeatMap();
       }
@@ -138,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!currentSeatsData || !currentSeatsData.seats) return;
 
     const seats = currentSeatsData.seats;
-    const mySeatNum = currentSeatsData.mySeat || 24;
+    const mySeatNum = currentSeatsData.mySeat || null;
 
     const filterFn = (s) => {
       // Match filter

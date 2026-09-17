@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusSubtext.className = 'text-xs text-emerald-300 font-normal';
       }
 
+      // Clear active entry session
+      sessionStorage.removeItem('dinespace_entry_success');
+
       // Store completed visit data for Page 7 (Visit Completed)
       sessionStorage.setItem('dinespace_exit_success', JSON.stringify(result));
 
@@ -89,15 +92,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusSubtext.className = 'text-xs text-emerald-300 font-normal';
       }
 
+      let seatNum = 24;
+      let entryIso = new Date(Date.now() - 18 * 60 * 1000).toISOString();
+      let durationMins = 18;
+      const storedEntry = sessionStorage.getItem('dinespace_entry_success');
+      if (storedEntry) {
+        try {
+          const parsed = JSON.parse(storedEntry);
+          seatNum = parsed.seatNumber || parsed.visit?.seatNumber || seatNum;
+          if (parsed.visit?.entryTime || parsed.entryTime) {
+            entryIso = parsed.visit?.entryTime || parsed.entryTime;
+            const diffMs = Date.now() - new Date(entryIso).getTime();
+            durationMins = Math.max(1, Math.round(diffMs / 60000));
+          }
+        } catch (e) {}
+      }
+      sessionStorage.removeItem('dinespace_entry_success');
+
       const fallbackVisit = {
         success: true,
         message: 'Visit completed successfully',
         visit: {
-          seatNumber: 24,
+          seatNumber: seatNum,
           diningHall: 'Central Mess',
-          entryTime: '2026-09-12T22:26:00Z',
-          exitTime: '2026-09-12T22:44:00Z',
-          durationMinutes: 18,
+          entryTime: entryIso,
+          exitTime: new Date().toISOString(),
+          durationMinutes: durationMins,
           status: 'completed'
         }
       };

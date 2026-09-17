@@ -23,29 +23,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadVisitHistory();
 });
 
+function applyProfile(student) {
+  const displayName = student.name || student.fullName || 'Student';
+  const studentId = student.studentId || 'STU1042';
+  const dept = student.department || 'Computer Science & Engineering';
+
+  const userNameEl = document.getElementById('user-name');
+  const userRegEl = document.getElementById('user-reg');
+  const dropNameEl = document.getElementById('dropdown-full-name');
+  const dropIdEl = document.getElementById('dropdown-student-id');
+
+  if (userNameEl) userNameEl.textContent = displayName;
+  if (userRegEl) userRegEl.textContent = `${studentId} | ${dept}`;
+  if (dropNameEl) dropNameEl.textContent = displayName;
+  if (dropIdEl) dropIdEl.textContent = studentId;
+}
+
 /**
  * Configure user profile pill and logout listener
  */
 async function setupProfile() {
+  const cached = Auth.getUser();
+  if (cached) {
+    applyProfile(cached);
+  }
+
   try {
     const student = await API.getMe();
-    if (student) {
-      const displayName = student.fullName || student.name || 'Kunal Kumar Singh';
-      const studentId = student.studentId || 'P132-NNK';
-      const dept = student.department || 'CSE';
-
-      const userNameEl = document.getElementById('user-name');
-      const userRegEl = document.getElementById('user-reg');
-      const dropNameEl = document.getElementById('dropdown-full-name');
-      const dropIdEl = document.getElementById('dropdown-student-id');
-
-      if (userNameEl) userNameEl.textContent = displayName;
-      if (userRegEl) userRegEl.textContent = `${studentId} | ${dept}`;
-      if (dropNameEl) dropNameEl.textContent = displayName;
-      if (dropIdEl) dropIdEl.textContent = studentId;
+    const resolved = student?.student || (student?.studentId ? student : null);
+    if (resolved) {
+      Auth.setUser(resolved);
+      applyProfile(resolved);
     }
   } catch (err) {
-    console.warn('Using default demo student profile:', err);
+    // Keep cached
   }
 
   // Dropdown toggle
@@ -63,8 +74,7 @@ async function setupProfile() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      API.logout();
-      window.location.href = 'login.html';
+      Auth.logout();
     });
   }
 
