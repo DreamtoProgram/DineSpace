@@ -194,6 +194,182 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // --- SSO Single Sign-On Integration ---
+  const ssoLoginBtn = document.getElementById('sso-login-btn');
+  const ssoModal = document.getElementById('sso-modal');
+  const ssoModalClose = document.getElementById('sso-modal-close');
+  const ssoCancelBtn = document.getElementById('sso-cancel-btn');
+  const ssoSubmitBtn = document.getElementById('sso-submit-btn');
+  const ssoEmailInput = document.getElementById('sso-email-input');
+  let selectedSSOProvider = 'google';
+
+  function openSSOModal() {
+    if (ssoModal) ssoModal.classList.remove('hidden');
+  }
+
+  function closeSSOModal() {
+    if (ssoModal) ssoModal.classList.add('hidden');
+  }
+
+  if (ssoLoginBtn) ssoLoginBtn.addEventListener('click', openSSOModal);
+  if (ssoModalClose) ssoModalClose.addEventListener('click', closeSSOModal);
+  if (ssoCancelBtn) ssoCancelBtn.addEventListener('click', closeSSOModal);
+
+  // Provider button selection
+  document.querySelectorAll('.sso-provider-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedSSOProvider = btn.getAttribute('data-provider');
+      document.querySelectorAll('.sso-provider-btn').forEach(b => {
+        b.className = 'sso-provider-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-white/5 text-gray-300 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer';
+      });
+      btn.className = 'sso-provider-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-orange-500/20 text-[#FF5E1E] border border-orange-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer';
+    });
+  });
+
+  // Quick account buttons in SSO modal
+  document.querySelectorAll('.sso-quick-account').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const email = btn.getAttribute('data-sso-email');
+      const provider = btn.getAttribute('data-sso-provider') || 'google';
+      if (ssoEmailInput) ssoEmailInput.value = email;
+      selectedSSOProvider = provider;
+      const pBtn = document.querySelector(`.sso-provider-btn[data-provider="${provider}"]`);
+      if (pBtn) pBtn.click();
+    });
+  });
+
+  // SSO Submit
+  if (ssoSubmitBtn) {
+    ssoSubmitBtn.addEventListener('click', async () => {
+      const email = ssoEmailInput ? ssoEmailInput.value.trim() : '';
+      if (!email) {
+        alert('Please enter or select a valid university email.');
+        return;
+      }
+      ssoSubmitBtn.disabled = true;
+      ssoSubmitBtn.innerHTML = '<span>Verifying...</span>';
+
+      try {
+        const res = await API.loginSSO(selectedSSOProvider, null, email);
+        const student = res.student || {
+          studentId: res.studentId || 'SSO-USER',
+          name: res.name || email.split('@')[0],
+          email: email,
+          department: 'Campus Mess'
+        };
+        Auth.setUser(student);
+        closeSSOModal();
+        const targetPage = (student.role === 'admin' || student.studentId === 'ADMIN01') ? 'admin.html' : 'home.html';
+        window.location.href = targetPage;
+      } catch (err) {
+        ssoSubmitBtn.disabled = false;
+        ssoSubmitBtn.innerHTML = '<span>Authorize SSO</span>';
+        alert(err.message || 'SSO authentication failed. Please verify credentials.');
+      }
+    });
+  }
+
+  // --- RFID / NFC Smart Badge Tap Integration ---
+  const rfidLoginBtn = document.getElementById('rfid-login-btn');
+  const rfidModal = document.getElementById('rfid-modal');
+  const rfidModalClose = document.getElementById('rfid-modal-close');
+  const rfidCancelBtn = document.getElementById('rfid-cancel-btn');
+  const rfidSubmitBtn = document.getElementById('rfid-submit-btn');
+  const rfidCardUidInput = document.getElementById('rfid-card-uid-input');
+  const rfidStatusText = document.getElementById('rfid-status-text');
+  let nfcController = null;
+
+  async function openRFIDModal() {
+    if (rfidModal) rfidModal.classList.remove('hidden');
+    if ('NDEFReader' in window) {
+      try {
+        nfcController = new AbortController();
+        const ndef = new window.NDEFReader();
+        await ndef.scan({ signal: nfcController.signal });
+        if (rfidStatusText) {
+          rfidStatusText.textContent = 'Hardware NFC Active: Tap card to device back';
+        }
+        ndef.addEventListener('reading', async (event) => {
+          const serial = event.serialNumber;
+          if (serial) {
+            handleRFIDTap(serial);
+          }
+        });
+      } catch (err) {
+        console.warn('Web-NFC not initialized or permission dismissed:', err);
+      }
+    }
+  }
+
+  function closeRFIDModal() {
+    if (rfidModal) rfidModal.classList.add('hidden');
+    if (nfcController) {
+      nfcController.abort();
+      nfcController = null;
+    }
+  }
+
+  if (rfidLoginBtn) rfidLoginBtn.addEventListener('click', openRFIDModal);
+  if (rfidModalClose) rfidModalClose.addEventListener('click', closeRFIDModal);
+  if (rfidCancelBtn) rfidCancelBtn.addEventListener('click', closeRFIDModal);
+
+  // Quick card buttons in RFID modal
+  document.querySelectorAll('.rfid-quick-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cardUid = btn.getAttribute('data-card-uid');
+      if (rfidCardUidInput) rfidCardUidInput.value = cardUid;
+      document.querySelectorAll('.rfid-quick-card').forEach(b => {
+        b.className = 'rfid-quick-card text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer';
+      });
+      btn.className = 'rfid-quick-card text-left p-2.5 rounded-xl bg-orange-500/15 border border-orange-500/30 hover:bg-orange-500/25 transition-all cursor-pointer';
+    });
+  });
+
+  async function handleRFIDTap(cardUid) {
+    if (!cardUid) {
+      alert('Please enter or select a valid RFID Card UID.');
+      return;
+    }
+    if (rfidSubmitBtn) {
+      rfidSubmitBtn.disabled = true;
+      rfidSubmitBtn.innerHTML = '<span>Verifying Smart Card...</span>';
+    }
+    if (rfidStatusText) {
+      rfidStatusText.textContent = 'Authenticating Smart Badge ' + cardUid + '...';
+      rfidStatusText.className = 'text-xs font-semibold text-emerald-400';
+    }
+
+    try {
+      const res = await API.loginRFID(cardUid);
+      const student = res.student || {
+        studentId: res.studentId || 'RFID-USER',
+        name: res.name || 'RFID Student',
+        department: 'Campus Mess'
+      };
+      Auth.setUser(student);
+      closeRFIDModal();
+      const targetPage = (student.role === 'admin' || student.studentId === 'ADMIN01') ? 'admin.html' : 'home.html';
+      window.location.href = targetPage;
+    } catch (err) {
+      if (rfidSubmitBtn) {
+        rfidSubmitBtn.disabled = false;
+        rfidSubmitBtn.innerHTML = '<span>Tap Card Now</span>';
+      }
+      if (rfidStatusText) {
+        rfidStatusText.textContent = err.message || 'RFID card verification failed';
+        rfidStatusText.className = 'text-xs font-semibold text-red-400';
+      }
+      alert(err.message || 'Invalid or unregistered RFID card. Please try again.');
+    }
+  }
+
+  if (rfidSubmitBtn) {
+    rfidSubmitBtn.addEventListener('click', () => {
+      const cardUid = rfidCardUidInput ? rfidCardUidInput.value.trim() : '';
+      handleRFIDTap(cardUid);
+    });
+  }
+
   function setLoading(loading) {
     if (loading) {
       submitBtn.disabled = true;

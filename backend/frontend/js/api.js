@@ -136,6 +136,34 @@ const API = {
     return res;
   },
 
+  async loginSSO(provider, token = null, email = null, name = null) {
+    const res = await apiRequest('/auth/sso/login', {
+      method: 'POST',
+      body: JSON.stringify({ provider, token, email, name })
+    });
+    if (res.accessToken) {
+      Auth.setToken(res.accessToken);
+    }
+    if (res.student) {
+      Auth.setUser(res.student);
+    }
+    return res;
+  },
+
+  async loginRFID(cardUid, diningHall = null) {
+    const res = await apiRequest('/auth/rfid/tap', {
+      method: 'POST',
+      body: JSON.stringify({ cardUid, diningHall })
+    });
+    if (res.accessToken) {
+      Auth.setToken(res.accessToken);
+    }
+    if (res.student) {
+      Auth.setUser(res.student);
+    }
+    return res;
+  },
+
   async getMe() {
     const res = await apiRequest('/auth/me');
     if (res.student) {
@@ -187,10 +215,17 @@ const API = {
   },
 
   // Scans
-  async scanEntry(studentId, passCode) {
+  async scanEntry(studentId, passCode, diningHall = null) {
     return apiRequest('/scan/entry', {
       method: 'POST',
-      body: JSON.stringify({ studentId, passCode })
+      body: JSON.stringify({ studentId, passCode, diningHall })
+    });
+  },
+
+  async scanNFCEntry(cardUid, diningHall = null) {
+    return apiRequest('/scan/nfc-entry', {
+      method: 'POST',
+      body: JSON.stringify({ cardUid, diningHall })
     });
   },
 

@@ -14,6 +14,16 @@ class EntryScanRequest(BaseModel):
     )
 
 
+class NFCEntryScanRequest(BaseModel):
+    """Request schema for student dining hall RFID / NFC card tap check-in."""
+
+    cardUid: str = Field(..., min_length=1, description="Physical smart card chip UID or badge ID (e.g. CARD-8842-A1)")
+    diningHall: Optional[str] = Field(
+        default=None,
+        description="Optional target dining hall name. Defaults to system default if omitted.",
+    )
+
+
 class EntrySuccessResponse(BaseModel):
     """Response schema upon successful dining hall entry and seat assignment."""
 

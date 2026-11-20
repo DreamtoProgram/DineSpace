@@ -2,8 +2,8 @@ from typing import Any, Dict
 from fastapi import APIRouter, Depends, status
 
 from app.dependencies import get_current_student
-from app.schemas.auth import LoginRequest, LoginResponse, StudentPublic
-from app.services.auth_service import authenticate_student
+from app.schemas.auth import LoginRequest, LoginResponse, RFIDTapRequest, SSOLoginRequest, StudentPublic
+from app.services.auth_service import authenticate_rfid, authenticate_sso, authenticate_student
 from app.services.security import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -69,4 +69,68 @@ def get_current_user_profile(
         name=current_student["name"],
         role=current_student.get("role", "student"),
         department=current_student.get("department"),
+        email=current_student.get("email"),
+        rfidCardUid=current_student.get("rfidCardUid"),
+        ssoProvider=current_student.get("ssoProvider"),
+    )
+
+
+@router.post(
+    "/sso/login",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    summary="University SSO Login",
+    description="Authenticate via institutional Google Workspace, Microsoft 365, or Campus ERP Single Sign-On.",
+)
+def sso_login(payload: SSOLoginRequest) -> LoginResponse:
+    """Authenticate or dynamically provision student via institutional SSO."""
+    student = authenticate_sso(
+        provider=payload.provider,
+        token=payload.token,
+        email=payload.email,
+        name=payload.name,
+    )
+    access_token = create_access_token(data={"sub": student["studentId"]})
+    return LoginResponse(
+        success=True,
+        message=f"SSO authentication successful via {payload.provider.title()}",
+        accessToken=access_token,
+        tokenType="bearer",
+        student=StudentPublic(
+            studentId=student["studentId"],
+            name=student["name"],
+            role=student.get("role", "student"),
+            department=student.get("department"),
+            email=student.get("email"),
+            rfidCardUid=student.get("rfidCardUid"),
+            ssoProvider=student.get("ssoProvider", payload.provider),
+        ),
+    )
+
+
+@router.post(
+    "/rfid/tap",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    summary="University RFID / NFC Card Tap Authentication",
+    description="Authenticate a student by tapping their physical RFID university smart card / NFC badge.",
+)
+def rfid_tap_login(payload: RFIDTapRequest) -> LoginResponse:
+    """Authenticate student by scanning/tapping physical RFID smart card."""
+    student = authenticate_rfid(card_uid=payload.cardUid)
+    access_token = create_access_token(data={"sub": student["studentId"]})
+    return LoginResponse(
+        success=True,
+        message="RFID card verified successfully",
+        accessToken=access_token,
+        tokenType="bearer",
+        student=StudentPublic(
+            studentId=student["studentId"],
+            name=student["name"],
+            role=student.get("role", "student"),
+            department=student.get("department"),
+            email=student.get("email"),
+            rfidCardUid=student.get("rfidCardUid"),
+            ssoProvider="rfid_nfc",
+        ),
     )

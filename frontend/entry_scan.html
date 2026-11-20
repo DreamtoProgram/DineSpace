@@ -409,6 +409,21 @@
               <span>Flip</span>
             </button>
 
+            <!-- 1-Tap Entrance Kiosk RFID / NFC Smart Card Tap Button -->
+            <button 
+              type="button" 
+              id="btn-nfc-kiosk-tap" 
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+              title="Tap physical RFID/NFC university smart card at entrance kiosk"
+            >
+              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10" stroke-width="2"></line>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15h2"></path>
+              </svg>
+              <span>📡 Tap Smart Card (RFID / NFC)</span>
+            </button>
+
             <button 
               type="button" 
               id="btn-quick-simulate" 
@@ -463,6 +478,96 @@
         <span>Profile</span>
       </a>
     </nav>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: 1-Tap Entrance Kiosk RFID / NFC Smart Card Tap                    -->
+    <!-- ========================================================================= -->
+    <div id="nfc-kiosk-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="bg-[#0E1624] border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10" stroke-width="2"></line>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15h2"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Smart Card Entrance Kiosk</h3>
+              <p class="text-[11px] text-[#8B9BB4]">Contactless 1-Tap RFID / NFC Check-In</p>
+            </div>
+          </div>
+          <button id="nfc-kiosk-close" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Animated NFC Wave Visual -->
+        <div class="flex flex-col items-center justify-center py-4 bg-[#080D15] rounded-xl border border-white/5 space-y-2">
+          <div class="w-16 h-16 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-400 animate-pulse">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div id="nfc-kiosk-status-text" class="text-xs font-semibold text-emerald-400">Ready for Contactless Smart Card Tap</div>
+          <p class="text-[11px] text-gray-400 text-center max-w-xs">
+            Hold your university smart card against the entrance reader or select an enrolled student badge below.
+          </p>
+        </div>
+
+        <!-- Quick Select Student Badges -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-gray-300">Tap Enrolled Student Smart Card</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-kiosk-card-uid="CARD-8842-A1" class="nfc-quick-badge text-left p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all cursor-pointer">
+              <div class="text-xs font-semibold text-white">Sarah Chen</div>
+              <div class="text-[10px] text-emerald-300 font-mono">CARD-8842-A1</div>
+            </button>
+            <button type="button" data-kiosk-card-uid="CARD-1042-B2" class="nfc-quick-badge text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+              <div class="text-xs font-semibold text-white">Kunal Singh</div>
+              <div class="text-[10px] text-gray-400 font-mono">CARD-1042-B2</div>
+            </button>
+            <button type="button" data-kiosk-card-uid="CARD-8843-C3" class="nfc-quick-badge text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+              <div class="text-xs font-semibold text-white">Alex Sharma</div>
+              <div class="text-[10px] text-gray-400 font-mono">CARD-8843-C3</div>
+            </button>
+            <button type="button" data-kiosk-card-uid="CARD-8844-D4" class="nfc-quick-badge text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+              <div class="text-xs font-semibold text-white">Rahul Singh</div>
+              <div class="text-[10px] text-gray-400 font-mono">CARD-8844-D4</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Smart Card UID Input -->
+        <div class="space-y-1.5">
+          <label for="nfc-kiosk-card-uid" class="block text-xs font-semibold text-gray-300">Badge Serial / Card UID</label>
+          <input 
+            type="text" 
+            id="nfc-kiosk-card-uid" 
+            placeholder="e.g. CARD-8842-A1"
+            value="CARD-8842-A1"
+            class="custom-input w-full px-3.5 py-2.5 rounded-xl text-xs text-white placeholder-gray-500 font-mono uppercase"
+          />
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="nfc-kiosk-cancel" class="px-4 py-2.5 rounded-xl bg-white/5 text-gray-300 hover:text-white text-xs font-semibold cursor-pointer">
+            Cancel
+          </button>
+          <button type="button" id="nfc-kiosk-submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors shadow-lg">
+            <span>Tap & Check In</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polyline points="9 18 15 12 9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
   </main>
 

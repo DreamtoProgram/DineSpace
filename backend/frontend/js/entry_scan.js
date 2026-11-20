@@ -324,6 +324,156 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // --- 1-Tap Entrance Kiosk RFID / NFC Smart Card Logic ---
+  const btnNfcKioskTap = document.getElementById('btn-nfc-kiosk-tap');
+  const nfcKioskModal = document.getElementById('nfc-kiosk-modal');
+  const nfcKioskClose = document.getElementById('nfc-kiosk-close');
+  const nfcKioskCancel = document.getElementById('nfc-kiosk-cancel');
+  const nfcKioskSubmit = document.getElementById('nfc-kiosk-submit');
+  const nfcKioskCardUid = document.getElementById('nfc-kiosk-card-uid');
+  const nfcKioskStatusText = document.getElementById('nfc-kiosk-status-text');
+  let kioskNfcController = null;
+
+  async function openNFCKioskModal() {
+    if (nfcKioskModal) nfcKioskModal.classList.remove('hidden');
+    if ('NDEFReader' in window) {
+      try {
+        kioskNfcController = new AbortController();
+        const ndef = new window.NDEFReader();
+        await ndef.scan({ signal: kioskNfcController.signal });
+        if (nfcKioskStatusText) {
+          nfcKioskStatusText.textContent = 'Hardware NFC Reader Ready: Tap Smart Card';
+        }
+        ndef.addEventListener('reading', async (event) => {
+          const serial = event.serialNumber;
+          if (serial) {
+            performNFCEntry(serial);
+          }
+        });
+      } catch (err) {
+        console.warn('Web-NFC not initialized or permission dismissed:', err);
+      }
+    }
+  }
+
+  function closeNFCKioskModal() {
+    if (nfcKioskModal) nfcKioskModal.classList.add('hidden');
+    if (kioskNfcController) {
+      kioskNfcController.abort();
+      kioskNfcController = null;
+    }
+  }
+
+  if (btnNfcKioskTap) {
+    btnNfcKioskTap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openNFCKioskModal();
+    });
+  }
+  if (nfcKioskClose) nfcKioskClose.addEventListener('click', closeNFCKioskModal);
+  if (nfcKioskCancel) nfcKioskCancel.addEventListener('click', closeNFCKioskModal);
+
+  document.querySelectorAll('.nfc-quick-badge').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cardUid = btn.getAttribute('data-kiosk-card-uid');
+      if (nfcKioskCardUid) nfcKioskCardUid.value = cardUid;
+      document.querySelectorAll('.nfc-quick-badge').forEach(b => {
+        b.className = 'nfc-quick-badge text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer';
+      });
+      btn.className = 'nfc-quick-badge text-left p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all cursor-pointer';
+    });
+  });
+
+  async function performNFCEntry(cardUid) {
+    if (!cardUid) {
+      alert('Please enter or select a valid RFID card UID.');
+      return;
+    }
+    if (isScanning) return;
+    isScanning = true;
+
+    if (autoScanTimer) {
+      clearTimeout(autoScanTimer);
+      autoScanTimer = null;
+    }
+
+    playBeepSound();
+
+    if (nfcKioskStatusText) {
+      nfcKioskStatusText.textContent = 'Reading smart card ' + cardUid + '...';
+      nfcKioskStatusText.className = 'text-xs font-semibold text-emerald-400';
+    }
+    if (nfcKioskSubmit) {
+      nfcKioskSubmit.disabled = true;
+      nfcKioskSubmit.innerHTML = '<span>Verifying Smart Card...</span>';
+    }
+
+    const selectedHall = Auth.getSelectedHall() || 'Central Mess';
+
+    try {
+      const result = await API.scanNFCEntry(cardUid, selectedHall);
+      const finalSeat = result.seatNumber || result.visit?.seatNumber || 24;
+
+      if (laserLine) laserLine.classList.add('laser-line-success');
+      if (statusInstruction) {
+        statusInstruction.textContent = `NFC Smart Card Verified! Seat #${finalSeat} assigned.`;
+        statusInstruction.className = 'text-sm text-emerald-400 font-semibold tracking-wide text-center mt-7';
+      }
+
+      sessionStorage.setItem('dinespace_entry_success', JSON.stringify({
+        ...result,
+        studentId: result.studentId || result.student?.studentId,
+        seatNumber: finalSeat,
+        visit: {
+          seatNumber: finalSeat,
+          diningHall: result.diningHall || selectedHall,
+          entryTime: result.entryTime || new Date().toISOString(),
+          status: 'active'
+        }
+      }));
+
+      closeNFCKioskModal();
+      await stopCamera();
+
+      setTimeout(() => {
+        window.location.href = 'entry_success.html';
+      }, 700);
+
+    } catch (err) {
+      isScanning = false;
+      if (nfcKioskSubmit) {
+        nfcKioskSubmit.disabled = false;
+        nfcKioskSubmit.innerHTML = '<span>Tap & Check In</span>';
+      }
+
+      if (err.status === 409) {
+        if (laserLine) laserLine.classList.add('laser-line-success');
+        if (statusInstruction) {
+          statusInstruction.textContent = 'Active visit already in progress! Opening your seat...';
+          statusInstruction.className = 'text-sm text-amber-400 font-semibold tracking-wide text-center mt-7';
+        }
+        closeNFCKioskModal();
+        await stopCamera();
+        setTimeout(() => {
+          window.location.href = 'my_visit.html';
+        }, 1200);
+      } else {
+        if (nfcKioskStatusText) {
+          nfcKioskStatusText.textContent = err.message || 'RFID Card check-in failed';
+          nfcKioskStatusText.className = 'text-xs font-semibold text-red-400';
+        }
+        alert(err.message || 'Invalid or unregistered RFID card. Please try again.');
+      }
+    }
+  }
+
+  if (nfcKioskSubmit) {
+    nfcKioskSubmit.addEventListener('click', () => {
+      const cardUid = nfcKioskCardUid ? nfcKioskCardUid.value.trim() : '';
+      performNFCEntry(cardUid);
+    });
+  }
+
   // Tap main scanner card to simulate immediately (only when camera is not running)
   if (scannerCard) {
     scannerCard.addEventListener('click', () => {

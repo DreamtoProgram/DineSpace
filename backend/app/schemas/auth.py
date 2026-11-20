@@ -16,6 +16,25 @@ class StudentPublic(BaseModel):
     name: str = Field(..., description="Student's full name")
     role: str = Field(default="student", description="Account role: 'student' or 'admin'")
     department: Optional[str] = Field(default=None, description="Department or staff unit")
+    email: Optional[str] = Field(default=None, description="University email address")
+    rfidCardUid: Optional[str] = Field(default=None, description="Physical RFID badge serial number")
+    ssoProvider: Optional[str] = Field(default=None, description="SSO authentication provider")
+
+
+class SSOLoginRequest(BaseModel):
+    """Schema for campus Single Sign-On (Google / Microsoft 365 / Campus ERP)."""
+
+    provider: str = Field(..., description="SSO Provider: 'google', 'microsoft', or 'campus_erp'")
+    token: Optional[str] = Field(default=None, description="OAuth2 ID token or authorization token")
+    email: Optional[str] = Field(default=None, description="Verified institutional student email")
+    name: Optional[str] = Field(default=None, description="Student full name from directory")
+
+
+class RFIDTapRequest(BaseModel):
+    """Schema for tapping an RFID/NFC smart student badge."""
+
+    cardUid: str = Field(..., min_length=1, description="Unique physical RFID/NFC chip serial or card identifier")
+    diningHall: Optional[str] = Field(default="Central Mess", description="Target dining hall")
 
 
 class LoginResponse(BaseModel):

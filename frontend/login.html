@@ -353,26 +353,58 @@ Please contact your mess administrator or email support@campus.edu to reset your
               <div class="w-full border-t border-white/10"></div>
             </div>
             <div class="relative px-3 bg-[#0D1522] text-[11px] font-semibold text-[#8B9BB4] uppercase tracking-wider">
-              OR
+              OR CONTINUE WITH
             </div>
           </div>
 
-          <!-- Continue with QR On-Campus -->
-          <button 
-            type="button" 
-            id="qr-login-btn" 
-            class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-center gap-3.5 text-left group cursor-pointer"
-          >
-            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[#FF5E1E] flex-shrink-0 group-hover:border-orange-500/40 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+          <!-- University SSO & RFID Smart Card Options -->
+          <div class="space-y-2.5">
+            <!-- University SSO Button -->
+            <button 
+              type="button" 
+              id="sso-login-btn" 
+              class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-between gap-3 text-left group cursor-pointer hover:border-orange-500/40 transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-[#FF5E1E] flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white">Continue with University SSO</div>
+                  <div class="text-[10px] text-[#8B9BB4]">Google Workspace &middot; Microsoft 365 &middot; Campus ERP</div>
+                </div>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
               </svg>
-            </div>
-            <div class="flex-1">
-              <div class="text-xs font-semibold text-white">Continue with QR (On-Campus)</div>
-              <div class="text-[10px] text-[#8B9BB4]">Only for registered devices</div>
-            </div>
-          </button>
+            </button>
+
+            <!-- RFID Smart Card Tap Button -->
+            <button 
+              type="button" 
+              id="rfid-login-btn" 
+              class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-between gap-3 text-left group cursor-pointer hover:border-orange-500/40 transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-[#FF5E1E] flex-shrink-0 group-hover:bg-orange-500/20 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10" stroke-width="2"></line>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15h2"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white">Tap University RFID Card</div>
+                  <div class="text-[10px] text-[#8B9BB4]">Contactless NFC Student ID / Smart Badge</div>
+                </div>
+              </div>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">1-Tap</span>
+            </button>
+          </div>
 
           <!-- Administrator note & Demo Quick Switch -->
           <div class="mt-6 text-center space-y-3">
@@ -436,6 +468,201 @@ Please contact your mess administrator or email support@campus.edu to reset your
       &copy; 2026 DineSpace. Campus Dining System. All rights reserved.
     </footer>
 
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: University SSO Single Sign-On                                     -->
+  <!-- ========================================================================= -->
+  <div id="sso-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="bg-[#0E1624] border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-[#FF5E1E]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">University Single Sign-On</h3>
+            <p class="text-[11px] text-[#8B9BB4]">Campus Identity & Access Management</p>
+          </div>
+        </div>
+        <button id="sso-modal-close" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Identity Provider Selection -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-gray-300">Identity Provider</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" data-provider="google" class="sso-provider-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-orange-500/20 text-[#FF5E1E] border border-orange-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+            <span>Google</span>
+          </button>
+          <button type="button" data-provider="microsoft" class="sso-provider-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-white/5 text-gray-300 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+            <span>Microsoft</span>
+          </button>
+          <button type="button" data-provider="campus_erp" class="sso-provider-btn px-2.5 py-2 rounded-xl text-xs font-semibold bg-white/5 text-gray-300 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+            <span>Campus ERP</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick University Accounts -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-gray-300">Choose University Account</label>
+        <div class="space-y-1.5">
+          <button type="button" data-sso-email="sarah.chen@university.edu" data-sso-name="Sarah Chen" data-sso-provider="google" class="sso-quick-account w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-between transition-all cursor-pointer">
+            <div>
+              <div class="text-xs font-semibold text-white">Sarah Chen</div>
+              <div class="text-[10px] text-gray-400">sarah.chen@university.edu &middot; CSE</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-orange-500/15 text-[#FF5E1E] border border-orange-500/30">Select</span>
+          </button>
+          <button type="button" data-sso-email="kunal.singh@university.edu" data-sso-name="Kunal Kumar Singh" data-sso-provider="google" class="sso-quick-account w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-between transition-all cursor-pointer">
+            <div>
+              <div class="text-xs font-semibold text-white">Kunal Kumar Singh</div>
+              <div class="text-[10px] text-gray-400">kunal.singh@university.edu &middot; CSE</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-300">Select</span>
+          </button>
+          <button type="button" data-sso-email="alex.sharma@university.edu" data-sso-name="Alex Sharma" data-sso-provider="microsoft" class="sso-quick-account w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-between transition-all cursor-pointer">
+            <div>
+              <div class="text-xs font-semibold text-white">Alex Sharma</div>
+              <div class="text-[10px] text-gray-400">alex.sharma@university.edu &middot; IT</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-300">Select</span>
+          </button>
+          <button type="button" data-sso-email="rahul.singh@university.edu" data-sso-name="Rahul Singh" data-sso-provider="campus_erp" class="sso-quick-account w-full text-left p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-between transition-all cursor-pointer">
+            <div>
+              <div class="text-xs font-semibold text-white">Rahul Singh</div>
+              <div class="text-[10px] text-gray-400">rahul.singh@university.edu &middot; ME</div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-300">Select</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom University Email Input -->
+      <div class="space-y-1.5 pt-1">
+        <label for="sso-email-input" class="block text-xs font-semibold text-gray-300">Or Enter University Email</label>
+        <input 
+          type="email" 
+          id="sso-email-input" 
+          placeholder="your.name@university.edu"
+          value="sarah.chen@university.edu"
+          class="custom-input w-full px-3.5 py-2.5 rounded-xl text-xs text-white placeholder-gray-500 font-medium"
+        />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="sso-cancel-btn" class="px-4 py-2.5 rounded-xl bg-white/5 text-gray-300 hover:text-white text-xs font-semibold cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="sso-submit-btn" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer">
+          <span>Authorize SSO</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"></line>
+            <polyline points="12 5 19 12 12 19" stroke-width="2" stroke-linecap="round"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: Physical RFID / NFC Smart Card Tap                                -->
+  <!-- ========================================================================= -->
+  <div id="rfid-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="bg-[#0E1624] border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-[#FF5E1E]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10" stroke-width="2"></line>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15h2"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Tap University RFID Card</h3>
+            <p class="text-[11px] text-[#8B9BB4]">Contactless Smart Card / Badge Reader</p>
+          </div>
+        </div>
+        <button id="rfid-modal-close" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- NFC Antenna Animation Visual -->
+      <div class="flex flex-col items-center justify-center py-4 bg-[#080D15] rounded-xl border border-white/5 space-y-2">
+        <div class="w-16 h-16 rounded-full bg-orange-500/10 border-2 border-orange-500/30 flex items-center justify-center text-[#FF5E1E] animate-pulse">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <div id="rfid-status-text" class="text-xs font-semibold text-orange-400">Ready for Contactless Tap</div>
+        <p class="text-[11px] text-gray-400 text-center max-w-xs">
+          Hold your physical student RFID card / badge near your device or select an enrolled card below.
+        </p>
+      </div>
+
+      <!-- Quick Badges -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-gray-300">Enrolled Student Smart Badges</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" data-card-uid="CARD-8842-A1" class="rfid-quick-card text-left p-2.5 rounded-xl bg-orange-500/15 border border-orange-500/30 hover:bg-orange-500/25 transition-all cursor-pointer">
+            <div class="text-xs font-semibold text-white">Sarah Chen</div>
+            <div class="text-[10px] text-orange-300 font-mono">CARD-8842-A1</div>
+          </button>
+          <button type="button" data-card-uid="CARD-1042-B2" class="rfid-quick-card text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+            <div class="text-xs font-semibold text-white">Kunal Singh</div>
+            <div class="text-[10px] text-gray-400 font-mono">CARD-1042-B2</div>
+          </button>
+          <button type="button" data-card-uid="CARD-8843-C3" class="rfid-quick-card text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+            <div class="text-xs font-semibold text-white">Alex Sharma</div>
+            <div class="text-[10px] text-gray-400 font-mono">CARD-8843-C3</div>
+          </button>
+          <button type="button" data-card-uid="CARD-8844-D4" class="rfid-quick-card text-left p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+            <div class="text-xs font-semibold text-white">Rahul Singh</div>
+            <div class="text-[10px] text-gray-400 font-mono">CARD-8844-D4</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Manual Card UID Input -->
+      <div class="space-y-1.5">
+        <label for="rfid-card-uid-input" class="block text-xs font-semibold text-gray-300">Card UID / Badge Serial</label>
+        <input 
+          type="text" 
+          id="rfid-card-uid-input" 
+          placeholder="e.g. CARD-8842-A1"
+          value="CARD-8842-A1"
+          class="custom-input w-full px-3.5 py-2.5 rounded-xl text-xs text-white placeholder-gray-500 font-mono uppercase"
+        />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="rfid-cancel-btn" class="px-4 py-2.5 rounded-xl bg-white/5 text-gray-300 hover:text-white text-xs font-semibold cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="rfid-submit-btn" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer">
+          <span>Tap Card Now</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="js/api.js"></script>

@@ -29,6 +29,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "passCode": "PASS-1042",
         "isActive": True,
         "department": "Computer Science & Engineering",
+        "email": "kunal.singh@university.edu",
+        "rfidCardUid": "CARD-1042-B2",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
     "STU1042": {
@@ -37,6 +39,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "passCode": "PASS-8842",
         "isActive": True,
         "department": "Computer Science & Engineering",
+        "email": "sarah.chen@university.edu",
+        "rfidCardUid": "CARD-8842-A1",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
     "STU1043": {
@@ -45,6 +49,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "passCode": "PASS-8843",
         "isActive": True,
         "department": "Information Technology",
+        "email": "alex.sharma@university.edu",
+        "rfidCardUid": "CARD-8843-C3",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
     "STU1044": {
@@ -53,6 +59,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "passCode": "PASS-8844",
         "isActive": True,
         "department": "Mechanical Engineering",
+        "email": "rahul.singh@university.edu",
+        "rfidCardUid": "CARD-8844-D4",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
     "STU9999": {
@@ -62,6 +70,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "isActive": False,
         "role": "student",
         "department": "Campus Dining",
+        "email": "inactive@university.edu",
+        "rfidCardUid": "CARD-9999-XX",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
     "ADMIN01": {
@@ -71,6 +81,8 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "isActive": True,
         "role": "admin",
         "department": "Dining Services Management",
+        "email": "admin.rajesh@university.edu",
+        "rfidCardUid": "CARD-ADMIN-99",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
 }
@@ -156,6 +168,105 @@ def authenticate_student(student_id: str, password: str) -> Dict[str, Any]:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid student ID or password",
+        )
+
+    return student
+
+
+def authenticate_sso(
+    provider: str,
+    token: Optional[str] = None,
+    email: Optional[str] = None,
+    name: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Authenticate or provision a student via University Single Sign-On (Google / Microsoft 365 / Campus ERP)."""
+    valid_providers = ["google", "microsoft", "campus_erp", "campus_sso"]
+    if provider.lower() not in valid_providers:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported SSO provider '{provider}'. Must be one of: {', '.join(valid_providers)}",
+        )
+
+    student = None
+    if email:
+        clean_email = email.strip().lower()
+        if db_manager.is_connected:
+            try:
+                student = db_manager.students.find_one({"email": clean_email})
+            except Exception:
+                pass
+
+        if not student:
+            for s in DEMO_STUDENTS.values():
+                if s.get("email", "").lower() == clean_email:
+                    student = s
+                    break
+
+    if not student and token:
+        clean_tok = token.strip().upper()
+        if clean_tok in DEMO_STUDENTS:
+            student = DEMO_STUDENTS[clean_tok]
+
+    if not student:
+        derived_id = f"SSO{abs(hash(email or name or token or 'student')) % 9000 + 1000}"
+        student = {
+            "studentId": derived_id,
+            "name": name or (email.split("@")[0].replace(".", " ").title() if email else "University Student"),
+            "email": email or f"{derived_id.lower()}@university.edu",
+            "passCode": f"PASS-{derived_id[-4:]}",
+            "isActive": True,
+            "role": "student",
+            "department": "Undergraduate Studies",
+            "ssoProvider": provider.lower(),
+        }
+        if db_manager.is_connected:
+            try:
+                db_manager.students.insert_one({**student, "passwordHash": ""})
+            except Exception:
+                pass
+
+    if not student.get("isActive", True):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Student account is inactive. Please contact dining hall administration.",
+        )
+
+    return student
+
+
+def authenticate_rfid(card_uid: str) -> Dict[str, Any]:
+    """Authenticate a student by their physical RFID / NFC smart badge serial number."""
+    if not card_uid or not card_uid.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Card UID is required for RFID authentication.",
+        )
+
+    clean_uid = card_uid.strip().upper()
+    student = None
+
+    if db_manager.is_connected:
+        try:
+            student = db_manager.students.find_one({"rfidCardUid": clean_uid})
+        except Exception:
+            pass
+
+    if not student:
+        for s in DEMO_STUDENTS.values():
+            if s.get("rfidCardUid", "").upper() == clean_uid:
+                student = s
+                break
+
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unrecognized RFID / NFC card badge '{card_uid}'. Please register this card at the Mess Administration office.",
+        )
+
+    if not student.get("isActive", True):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Student account associated with this RFID card is deactivated.",
         )
 
     return student

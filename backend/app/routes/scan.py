@@ -8,7 +8,9 @@ from app.schemas.scan import (
     EntrySuccessResponse,
     ExitScanRequest,
     ExitSuccessResponse,
+    NFCEntryScanRequest,
 )
+from app.services.auth_service import authenticate_rfid
 from app.services.entry_service import assign_virtual_seat_and_checkin
 from app.services.visit_service import complete_current_visit
 
@@ -50,6 +52,47 @@ def scan_entry(
         student=StudentPublic(
             studentId=current_student["studentId"],
             name=current_student["name"],
+        ),
+        seatNumber=record["seatNumber"],
+        diningHall=record["diningHall"],
+        entryTime=record["entryTime"],
+        mealType=record.get("mealType"),
+    )
+
+
+@router.post(
+    "/nfc-entry",
+    response_model=EntrySuccessResponse,
+    status_code=status.HTTP_200_OK,
+    summary="1-Tap RFID / NFC Smart Badge Kiosk Entry",
+    description="Tap physical university smart card or student badge at entrance terminal to instantly check in and receive a virtual seat.",
+    responses={
+        200: {"description": "NFC entry successful; virtual seat assigned."},
+        400: {"description": "Invalid card UID provided."},
+        403: {"description": "Student account associated with card is deactivated."},
+        404: {"description": "Unregistered RFID card UID."},
+        409: {"description": "Student already has an active dining visit or dining hall is full."},
+    },
+)
+def scan_nfc_entry(payload: NFCEntryScanRequest) -> EntrySuccessResponse:
+    """Validate physical RFID card, authenticate student, and assign lowest available virtual seat."""
+    student = authenticate_rfid(card_uid=payload.cardUid)
+    record = assign_virtual_seat_and_checkin(
+        student=student,
+        pass_code=student["passCode"],
+        dining_hall=payload.diningHall,
+    )
+
+    return EntrySuccessResponse(
+        success=True,
+        message=f"Welcome {student['name'].split()[0]}! Smart badge verified via RFID tap.",
+        student=StudentPublic(
+            studentId=student["studentId"],
+            name=student["name"],
+            role=student.get("role", "student"),
+            department=student.get("department"),
+            email=student.get("email"),
+            rfidCardUid=student.get("rfidCardUid"),
         ),
         seatNumber=record["seatNumber"],
         diningHall=record["diningHall"],

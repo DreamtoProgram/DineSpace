@@ -12,3 +12,8 @@ class Student(BaseModel):
     isActive: bool = Field(default=True, description="Whether the student account is active for login")
     role: str = Field(default="student", description="User role: 'student' or 'admin'")
     department: Optional[str] = Field(default=None, description="Academic department or staff role")
+    email: Optional[str] = Field(default=None, description="Institutional university email address")
+    rfidCardUid: Optional[str] = Field(default=None, description="Unique physical RFID / NFC smart badge serial number")
+    ssoProvider: Optional[str] = Field(default=None, description="SSO identity provider: 'google', 'microsoft', or 'campus_erp'")
+    degree: Optional[str] = Field(default="B.Tech", description="Degree program")
+    semester: Optional[int] = Field(default=6, description="Current academic semester")
