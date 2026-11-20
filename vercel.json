@@ -3,7 +3,8 @@
   "public": true,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "http://127.0.0.1:8000/api/$1" },
+    { "source": "/api", "destination": "/api/index.py" },
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
     { "source": "/(.*)", "destination": "/frontend/$1" }
   ]
 }

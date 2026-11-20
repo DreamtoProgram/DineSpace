@@ -52,21 +52,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         logger.warning("Notice ensuring indexes: %s", exc)
 
-    # Start periodic seat timeout sweeper background worker
-    sweeper = TimeoutSweeperWorker()
-    try:
-        sweeper.start()
-    except Exception as exc:
-        logger.warning("Sweeper startup notice: %s", exc)
+    # Start periodic seat timeout sweeper background worker (skip in serverless functions to avoid event loop stalling)
+    is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+    sweeper = None
+    if not is_serverless:
+        sweeper = TimeoutSweeperWorker()
+        try:
+            sweeper.start()
+        except Exception as exc:
+            logger.warning("Sweeper startup notice: %s", exc)
 
     try:
         yield
     finally:
         logger.info("Shutting down DineSpace Backend...")
-        try:
-            await sweeper.stop()
-        except Exception:
-            pass
+        if sweeper is not None:
+            try:
+                await sweeper.stop()
+            except Exception:
+                pass
         try:
             db_manager.close()
         except Exception:
@@ -117,6 +121,23 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 
 # Register API routes
+@app.get("/api", tags=["Root"], summary="API Root Status")
+def api_root():
+    """Return top-level API status and key endpoint map."""
+    return {
+        "status": "online",
+        "service": "DineSpace API",
+        "version": "0.1.0",
+        "endpoints": {
+            "health": f"{settings.API_V1_PREFIX}/health",
+            "status": f"{settings.API_V1_PREFIX}/status",
+            "menu": f"{settings.API_V1_PREFIX}/menu/today",
+            "seats": f"{settings.API_V1_PREFIX}/seats",
+            "auth": f"{settings.API_V1_PREFIX}/auth/login",
+            "scan": f"{settings.API_V1_PREFIX}/scan/entry",
+        },
+    }
+
 app.include_router(health_router, prefix=settings.API_V1_PREFIX)
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(menu_router, prefix=settings.API_V1_PREFIX)
