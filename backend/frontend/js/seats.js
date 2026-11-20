@@ -211,6 +211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const div = document.createElement('div');
       div.className = `seat-node h-11 sm:h-10 rounded-xl flex flex-col items-center justify-center cursor-pointer relative group active:scale-95 transition-transform touch-manipulation select-none ${bgClass} ${borderClass}`;
       div.setAttribute('title', `Seat #${s.seatNumber} (${tooltipStatus})`);
+      div.setAttribute('data-seat-number', s.seatNumber);
 
       div.innerHTML = `
         <span class="text-xs ${textClass}">${s.seatNumber}</span>
@@ -300,4 +301,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initial Background Load
   loadSeats();
+
+  // Instant real-time updates via WebSocket / SSE broadcast
+  if (window.DineSpaceRealtime) {
+    window.DineSpaceRealtime.subscribe((event) => {
+      if (event.event === 'occupancy_update') {
+        if (event.seatNumber && currentSeatsData && currentSeatsData.seats) {
+          const target = currentSeatsData.seats.find(s => s.seatNumber === event.seatNumber);
+          if (target) {
+            target.status = event.seatStatus || 'available';
+          }
+          if (event.occupancy) {
+            currentSeatsData.occupiedCount = event.occupancy.occupiedSeats;
+            currentSeatsData.availableCount = event.occupancy.availableSeats;
+          }
+          renderMetrics();
+          renderGrids();
+        } else {
+          loadSeats();
+        }
+      }
+    });
+  }
 });

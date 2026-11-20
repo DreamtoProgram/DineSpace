@@ -632,11 +632,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initial load
   await refreshAll();
 
-  // Periodic polling every 12 seconds
+  // Real-Time subscription for instant updates on seats & overview
+  if (window.DineSpaceRealtime) {
+    window.DineSpaceRealtime.subscribe((event) => {
+      if (activeTab === 'overview') {
+        loadAnalytics();
+      } else if (activeTab === 'seats') {
+        loadSeats();
+      }
+    });
+  }
+
+  // Periodic polling fallback every 15 seconds
   const pollTimer = setInterval(() => {
     if (activeTab === 'overview') loadAnalytics();
     else if (activeTab === 'seats') loadSeats();
-  }, 12000);
+  }, 15000);
 
   window.addEventListener('beforeunload', () => clearInterval(pollTimer));
 });

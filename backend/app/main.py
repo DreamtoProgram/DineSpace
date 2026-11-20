@@ -13,6 +13,7 @@ from app.database import db_manager
 from app.routes.auth import router as auth_router
 from app.routes.admin import router as admin_router
 from app.routes.health import router as health_router
+from app.routes.realtime import router as realtime_router
 from app.routes.menu import router as menu_router
 from app.routes.notifications import router as notifications_router
 from app.routes.scan import router as scan_router
@@ -45,6 +46,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.warning("MongoDB connect notice: %s", exc)
 
     # Ensure database indexes safely
+    try:
+        from app.services.broadcaster import realtime_manager
+        import asyncio
+        realtime_manager.register_loop(asyncio.get_running_loop())
+    except Exception as exc:
+        logger.debug("Loop register notice: %s", exc)
+
     try:
         ensure_student_indexes()
         ensure_menu_indexes()
@@ -149,6 +157,7 @@ app.include_router(visits_router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
 app.include_router(admin_router, prefix=settings.API_V1_PREFIX)
+app.include_router(realtime_router, prefix=settings.API_V1_PREFIX)
 
 # Determine frontend static directory with comprehensive fallbacks
 frontend_candidates = [

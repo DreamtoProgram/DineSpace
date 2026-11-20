@@ -330,6 +330,18 @@ def set_seat_status(
                 upsert=True,
             )
 
+        try:
+            from app.services.broadcaster import broadcast_occupancy_change
+            broadcast_occupancy_change(
+                event_type="seat_override",
+                seat_number=seat_number,
+                seat_status=status_value,
+                dining_hall=hall,
+                extra={"note": note},
+            )
+        except Exception:
+            pass
+
         return {
             "success": True,
             "seatNumber": seat_number,
@@ -381,6 +393,18 @@ def release_seat(
                 "status": {"$in": ["maintenance", "reserved"]},
             }
         )
+
+        try:
+            from app.services.broadcaster import broadcast_occupancy_change
+            broadcast_occupancy_change(
+                event_type="seat_release",
+                seat_number=seat_number,
+                seat_status="available",
+                dining_hall=hall,
+                extra={"reason": reason},
+            )
+        except Exception:
+            pass
 
         return {
             "success": True,

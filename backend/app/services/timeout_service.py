@@ -118,6 +118,17 @@ def expire_abandoned_visits(
                         notif_exc,
                     )
 
+                try:
+                    from app.services.broadcaster import broadcast_occupancy_change
+                    broadcast_occupancy_change(
+                        event_type="timeout_release",
+                        seat_number=expired_doc["seatNumber"],
+                        seat_status="available",
+                        dining_hall=expired_doc.get("diningHall", "Central Mess"),
+                    )
+                except Exception:
+                    pass
+
         if expired_count > 0:
             logger.info(
                 "Expired %d abandoned dining visit(s) (occupied for > %d minutes)",

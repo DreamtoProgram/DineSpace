@@ -149,6 +149,17 @@ def assign_virtual_seat_and_checkin(
                 student_id,
                 student.get("name"),
             )
+            try:
+                from app.services.broadcaster import broadcast_occupancy_change
+                broadcast_occupancy_change(
+                    event_type="checkin",
+                    seat_number=candidate_seat,
+                    seat_status="occupied",
+                    dining_hall=hall,
+                    extra={"studentId": student_id, "name": student.get("name")},
+                )
+            except Exception:
+                pass
             return occupancy_record
         except DuplicateKeyError as exc:
             err_str = str(exc)

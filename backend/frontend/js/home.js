@@ -223,6 +223,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   ]);
 
   // Periodic Background Polling
-  setInterval(updateStatus, 5000);
-  setInterval(checkActiveVisit, 12000);
+  setInterval(updateStatus, 8000);
+  setInterval(checkActiveVisit, 15000);
+
+  // Subscribe to instant real-time events via WebSocket / SSE
+  if (window.DineSpaceRealtime) {
+    window.DineSpaceRealtime.subscribe((event) => {
+      if (event.event === 'occupancy_update' && event.occupancy) {
+        renderStatusUI(event.occupancy);
+      }
+    });
+  }
 });

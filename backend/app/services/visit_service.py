@@ -258,6 +258,18 @@ def complete_current_visit(
         duration_minutes,
     )
 
+    try:
+        from app.services.broadcaster import broadcast_occupancy_change
+        broadcast_occupancy_change(
+            event_type="checkout",
+            seat_number=updated_record["seatNumber"],
+            seat_status="available",
+            dining_hall=updated_record.get("diningHall", "Central Mess"),
+            extra={"studentId": student_id, "durationMinutes": duration_minutes},
+        )
+    except Exception:
+        pass
+
     # 5. Create notification for successful visit completion
     try:
         from app.services.notification_service import create_notification
