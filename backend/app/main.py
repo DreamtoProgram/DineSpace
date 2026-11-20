@@ -12,6 +12,7 @@ from app.config import get_settings
 from app.database import db_manager
 from app.routes.auth import router as auth_router
 from app.routes.admin import router as admin_router
+from app.routes.halls import router as halls_router
 from app.routes.health import router as health_router
 from app.routes.realtime import router as realtime_router
 from app.routes.menu import router as menu_router
@@ -142,6 +143,7 @@ def api_root():
             "status": f"{settings.API_V1_PREFIX}/status",
             "menu": f"{settings.API_V1_PREFIX}/menu/today",
             "seats": f"{settings.API_V1_PREFIX}/seats",
+            "halls": f"{settings.API_V1_PREFIX}/halls",
             "auth": f"{settings.API_V1_PREFIX}/auth/login",
             "scan": f"{settings.API_V1_PREFIX}/scan/entry",
         },
@@ -157,6 +159,7 @@ app.include_router(visits_router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
 app.include_router(admin_router, prefix=settings.API_V1_PREFIX)
+app.include_router(halls_router, prefix=settings.API_V1_PREFIX)
 app.include_router(realtime_router, prefix=settings.API_V1_PREFIX)
 
 # Determine frontend static directory with comprehensive fallbacks

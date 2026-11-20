@@ -35,7 +35,17 @@ def get_virtual_seat_map(
     """
     settings = get_settings()
     hall = dining_hall or settings.DEFAULT_DINING_HALL
-    capacity = settings.TOTAL_SEATS
+
+    # Dynamic capacity matching dining facility type
+    if hall == "North Hostel Mess":
+        capacity = 80
+        fallback_seat_list = [4, 9, 15, 22, 29, 36, 45, 54, 63, 72]
+    elif hall == "Food Court (Student Center)":
+        capacity = 120
+        fallback_seat_list = [2, 8, 14, 21, 28, 35, 44, 53, 62, 71, 80, 89, 98, 107, 114]
+    else:
+        capacity = settings.TOTAL_SEATS
+        fallback_seat_list = [3, 7, 12, 18, 25, 31, 34, 42, 51, 58, 64, 71, 77, 85, 92]
 
     # Resilient diningHall matching (matches specified hall or legacy records without diningHall)
     if hall == settings.DEFAULT_DINING_HALL:
@@ -64,7 +74,7 @@ def get_virtual_seat_map(
 
     default_occupied_docs = [
         {"seatNumber": s, "studentId": f"STU{1000+s}", "status": "occupied"}
-        for s in [3, 7, 12, 18, 25, 31, 34, 42, 51, 58, 64, 71, 77, 85, 92]
+        for s in fallback_seat_list
     ]
 
     if not db_manager.is_connected:

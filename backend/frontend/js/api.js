@@ -22,7 +22,8 @@ const API_CONFIG = {
     return 'http://127.0.0.1:8000/api';
   })(),
   tokenKey: 'dinespace_jwt_token',
-  userKey: 'dinespace_user_info'
+  userKey: 'dinespace_user_info',
+  hallKey: 'dinespace_selected_hall'
 };
 
 const Auth = {
@@ -48,6 +49,16 @@ const Auth = {
   },
   setUser(user) {
     localStorage.setItem(API_CONFIG.userKey, JSON.stringify(user));
+  },
+  getSelectedHall() {
+    return localStorage.getItem(API_CONFIG.hallKey) || 'Central Mess';
+  },
+  setSelectedHall(hallName) {
+    if (!hallName) return;
+    localStorage.setItem(API_CONFIG.hallKey, hallName);
+    try {
+      window.dispatchEvent(new CustomEvent('dinespace_hall_changed', { detail: { hallName } }));
+    } catch (e) {}
   },
   isAuthenticated() {
     return !!this.getToken();
@@ -140,19 +151,30 @@ const API = {
     return apiRequest('/health');
   },
 
+  // Dining Facilities
+  async getDiningHalls() {
+    return apiRequest('/halls');
+  },
+
   // Status & Crowd
-  async getStatus() {
-    return apiRequest('/status');
+  async getStatus(diningHall = null) {
+    const hall = diningHall || Auth.getSelectedHall();
+    const query = hall ? '?diningHall=' + encodeURIComponent(hall) : '';
+    return apiRequest('/status' + query);
   },
 
   // Menu
-  async getMenuToday() {
-    return apiRequest('/menu/today');
+  async getMenuToday(diningHall = null) {
+    const hall = diningHall || Auth.getSelectedHall();
+    const query = hall ? '?diningHall=' + encodeURIComponent(hall) : '';
+    return apiRequest('/menu/today' + query);
   },
 
   // Seats
-  async getSeats() {
-    return apiRequest('/seats');
+  async getSeats(diningHall = null) {
+    const hall = diningHall || Auth.getSelectedHall();
+    const query = hall ? '?diningHall=' + encodeURIComponent(hall) : '';
+    return apiRequest('/seats' + query);
   },
 
   // Visits

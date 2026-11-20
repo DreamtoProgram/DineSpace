@@ -127,8 +127,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load Seats from Backend or Fallback
   async function loadSeats() {
+    const currentHall = Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess';
+    const titleEl = document.getElementById('hall-layout-title');
+    if (titleEl) titleEl.textContent = `${currentHall} Floor Layout`;
+
     try {
-      const data = await API.getSeats();
+      const data = await API.getSeats(currentHall);
       if (data && data.seats && data.seats.length > 0) {
         currentSeatsData = data;
         if (!currentSeatsData.mySeat) {
@@ -267,12 +271,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Dining Hall Switcher
+  const activeHall = Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess';
   document.querySelectorAll('.hall-btn').forEach(btn => {
+    const hallName = btn.getAttribute('data-hall');
+    if (hallName === activeHall) {
+      btn.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5E1E] text-white shadow-md shadow-orange-500/20 whitespace-nowrap flex-shrink-0';
+    } else {
+      btn.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-semibold text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all whitespace-nowrap flex-shrink-0';
+    }
+
     btn.addEventListener('click', () => {
       document.querySelectorAll('.hall-btn').forEach(b => {
-        b.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-semibold text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all';
+        b.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-semibold text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all whitespace-nowrap flex-shrink-0';
       });
-      btn.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5E1E] text-white shadow-md shadow-orange-500/20';
+      btn.className = 'hall-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5E1E] text-white shadow-md shadow-orange-500/20 whitespace-nowrap flex-shrink-0';
+      const selected = btn.getAttribute('data-hall') || 'Central Mess';
+      if (Auth.setSelectedHall) Auth.setSelectedHall(selected);
       loadSeats();
     });
   });

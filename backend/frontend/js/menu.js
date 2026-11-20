@@ -269,10 +269,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   async function loadMenu() {
+    const currentHall = Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess';
     let items = MENU_DATABASE[selectedMeal] || [];
 
     try {
-      const liveData = await API.getMenuToday();
+      const liveData = await API.getMenuToday(currentHall);
       if (liveData && liveData.menus) {
         const matching = liveData.menus.find(m => m.mealType.toLowerCase() === selectedMeal.toLowerCase());
         if (matching && matching.items && matching.items.length > 0) {
@@ -282,11 +283,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return {
               name: apiItem.name,
               desc: apiItem.description || 'Prepared fresh daily by our campus culinary team.',
-              isVeg: !isNonVeg,
-              calories: isNonVeg ? 380 : 250,
+              isVeg: apiItem.dietary ? (apiItem.dietary.toLowerCase() !== 'non-vegetarian') : !isNonVeg,
+              calories: apiItem.calories || (isNonVeg ? 380 : 250),
               protein: isNonVeg ? '24g' : '10g',
               special: false,
-              allergens: 'Fresh Kitchen'
+              allergens: apiItem.category || 'Fresh Kitchen'
             };
           });
         }
@@ -383,6 +384,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       dishesGrid.appendChild(card);
     });
   }
+
+  // Dining Hall Switcher Tabs
+  const activeHall = Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess';
+  document.querySelectorAll('.menu-hall-btn').forEach(btn => {
+    const hallName = btn.getAttribute('data-hall');
+    if (hallName === activeHall) {
+      btn.className = 'menu-hall-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5E1E] text-white shadow-md shadow-orange-500/20 whitespace-nowrap flex-shrink-0';
+    } else {
+      btn.className = 'menu-hall-btn px-4 py-2 rounded-xl text-xs font-semibold text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all whitespace-nowrap flex-shrink-0';
+    }
+
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.menu-hall-btn').forEach(b => {
+        b.className = 'menu-hall-btn px-4 py-2 rounded-xl text-xs font-semibold text-[#8B9BB4] hover:text-white hover:bg-white/5 transition-all whitespace-nowrap flex-shrink-0';
+      });
+      btn.className = 'menu-hall-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5E1E] text-white shadow-md shadow-orange-500/20 whitespace-nowrap flex-shrink-0';
+      const selected = btn.getAttribute('data-hall') || 'Central Mess';
+      if (Auth.setSelectedHall) Auth.setSelectedHall(selected);
+      loadMenu();
+    });
+  });
 
   // Meal Tabs
   document.querySelectorAll('.meal-tab-btn').forEach(btn => {

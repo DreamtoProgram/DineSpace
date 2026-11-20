@@ -23,10 +23,15 @@ router = APIRouter(prefix="/menu", tags=["Menu"])
         404: {"description": "No menu found for today."},
     },
 )
-def get_today_menu() -> DayMenusResponse:
+def get_today_menu(
+    diningHall: Optional[str] = Query(
+        default=None,
+        description="Dining hall facility name (defaults to configured Central Mess)",
+    ),
+) -> DayMenusResponse:
     """Fetch all meal menus for today's date."""
     today = get_today_date_str()
-    menus = get_menus_for_date(today)
+    menus = get_menus_for_date(today, dining_hall=diningHall)
 
     if not menus:
         raise HTTPException(
@@ -69,12 +74,16 @@ def get_menu(
         description="Filter by specific meal type: 'Lunch' or 'Dinner'.",
         examples=[MealType.LUNCH],
     ),
+    diningHall: Optional[str] = Query(
+        None,
+        description="Optional filter by dining hall name.",
+    ),
 ) -> Union[SingleMenuResponse, DayMenusResponse]:
-    """Retrieve menu information filtered by date and optional meal category."""
+    """Retrieve menu information filtered by date, optional meal category, and dining hall."""
     target_date = get_today_date_str() if date is None else validate_date_format(date)
 
     if mealType is not None:
-        single_menu = get_menu_for_date_and_meal(target_date, mealType.value)
+        single_menu = get_menu_for_date_and_meal(target_date, mealType.value, dining_hall=diningHall)
         if not single_menu:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -86,7 +95,7 @@ def get_menu(
             items=single_menu.get("items", []),
         )
 
-    all_menus = get_menus_for_date(target_date)
+    all_menus = get_menus_for_date(target_date, dining_hall=diningHall)
     if not all_menus:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

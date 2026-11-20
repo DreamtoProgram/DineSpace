@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status
+from typing import Optional
+from fastapi import APIRouter, Query, status
 
 from app.schemas.occupancy import StatusResponse
 from app.services.occupancy_service import get_occupancy_status
@@ -29,12 +30,18 @@ router = APIRouter(tags=["Status"])
                         "crowdLevel": "Moderate",
                         "mealType": "Lunch",
                         "updatedAt": "2026-09-12T13:30:00+05:30",
+                        "diningHall": "Central Mess",
                     }
                 }
             },
         }
     },
 )
-def get_status() -> StatusResponse:
+def get_status(
+    diningHall: Optional[str] = Query(
+        default=None,
+        description="Dining hall facility name (defaults to configured Central Mess)",
+    ),
+) -> StatusResponse:
     """Return live occupancy metrics for the dining hall."""
-    return get_occupancy_status()
+    return get_occupancy_status(dining_hall=diningHall)

@@ -12,3 +12,4 @@ class StatusResponse(BaseModel):
     crowdLevel: str = Field(..., description="Crowd level categorization: 'Low', 'Moderate', or 'Peak Rush'")
     mealType: Optional[str] = Field(default=None, description="Current or upcoming meal period (e.g. Lunch, Dinner)")
     updatedAt: str = Field(..., description="Timezone-aware ISO 8601 timestamp when status was computed")
+    diningHall: Optional[str] = Field(default="Central Mess", description="Dining hall facility name")

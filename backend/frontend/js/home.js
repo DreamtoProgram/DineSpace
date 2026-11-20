@@ -38,6 +38,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Dining Hall Switcher Dropdown
+  const hallSwitcherBtn = document.getElementById('dining-hall-switcher-btn');
+  const hallDropdown = document.getElementById('dining-hall-dropdown');
+  const currentHallNameEl = document.getElementById('current-dining-hall-name');
+  const navHallNameEl = document.getElementById('nav-dining-hall-name');
+
+  function syncHallUI(hallName) {
+    if (currentHallNameEl) currentHallNameEl.textContent = hallName;
+    if (navHallNameEl) navHallNameEl.textContent = hallName;
+    document.querySelectorAll('.hall-option').forEach(opt => {
+      const isSelected = opt.getAttribute('data-hall') === hallName;
+      const checkEl = opt.querySelector('.hall-check');
+      if (checkEl) {
+        if (isSelected) checkEl.classList.remove('hidden');
+        else checkEl.classList.add('hidden');
+      }
+    });
+  }
+
+  const initialHall = Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess';
+  syncHallUI(initialHall);
+
+  if (hallSwitcherBtn && hallDropdown) {
+    hallSwitcherBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hallDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      hallDropdown.classList.add('hidden');
+    });
+
+    document.querySelectorAll('.hall-option').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const selectedHall = btn.getAttribute('data-hall');
+        if (selectedHall) {
+          if (Auth.setSelectedHall) Auth.setSelectedHall(selectedHall);
+          syncHallUI(selectedHall);
+          hallDropdown.classList.add('hidden');
+          await updateStatus();
+        }
+      });
+    });
+  }
+
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       Auth.logout();
@@ -153,9 +199,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function updateStatus() {
+  async function updateStatus(customHall = null) {
     try {
-      const status = await API.getStatus();
+      const hall = customHall || (Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess');
+      const status = await API.getStatus(hall);
       if (status) {
         localStorage.setItem('dinespace_cached_status', JSON.stringify(status));
         renderStatusUI(status);
@@ -164,6 +211,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Keep existing render or fallback
     }
   }
+
+  window.addEventListener('dinespace_hall_changed', (e) => {
+    const newHall = e.detail?.hallName || (Auth.getSelectedHall ? Auth.getSelectedHall() : 'Central Mess');
+    syncHallUI(newHall);
+    updateStatus(newHall);
+  });
 
   async function checkActiveVisit() {
     if (!Auth.isAuthenticated()) return;

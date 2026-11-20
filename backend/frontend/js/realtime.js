@@ -32,10 +32,12 @@
 
     const wsProto = isHttps ? 'wss://' : 'ws://';
     const httpProto = isHttps ? 'https://' : 'http://';
+    const hall = (typeof Auth !== 'undefined' && Auth.getSelectedHall) ? Auth.getSelectedHall() : 'Central Mess';
+    const query = '?diningHall=' + encodeURIComponent(hall);
 
     return {
-      ws: `${wsProto}${wsHost}/api/ws/occupancy`,
-      sse: `${httpProto}${wsHost}/api/sse/occupancy`
+      ws: `${wsProto}${wsHost}/api/ws/occupancy${query}`,
+      sse: `${httpProto}${wsHost}/api/sse/occupancy${query}`
     };
   }
 
@@ -249,8 +251,24 @@
     },
     init() {
       connectWebSocket();
+    },
+    reconnect() {
+      if (socket) {
+        try { socket.close(); } catch (e) {}
+      }
+      if (eventSource) {
+        try { eventSource.close(); } catch (e) {}
+      }
+      connectWebSocket();
     }
   };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('dinespace_hall_changed', () => {
+      logger('Dining hall changed, reconnecting stream for', Auth.getSelectedHall());
+      DineSpaceRealtime.reconnect();
+    });
+  }
 
   global.DineSpaceRealtime = DineSpaceRealtime;
 

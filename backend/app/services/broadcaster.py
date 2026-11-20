@@ -84,7 +84,7 @@ realtime_manager = ConnectionManager()
 
 def get_current_state_payload(event_type: str = "initial_state", dining_hall: str = "Central Mess") -> Dict[str, Any]:
     """Build a standard payload containing current occupancy and metrics."""
-    status_obj = get_occupancy_status()
+    status_obj = get_occupancy_status(dining_hall=dining_hall)
     return {
         "event": "occupancy_update",
         "type": event_type,

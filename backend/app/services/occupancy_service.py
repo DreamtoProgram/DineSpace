@@ -42,12 +42,33 @@ def ensure_occupancy_indexes() -> None:
         logger.warning("Could not ensure indexes on occupancy: %s", exc)
 
 
-def get_active_occupancy_count() -> int:
-    """Count total currently occupied seats with instant offline fallback."""
+def get_active_occupancy_count(dining_hall: Optional[str] = None) -> int:
+    """Count total currently occupied seats with instant offline fallback and hall filtering."""
     if not db_manager.is_connected:
+        if dining_hall == "North Hostel Mess":
+            return 28
+        elif dining_hall == "Food Court (Student Center)":
+            return 64
         return 42
     try:
-        return db_manager.occupancy.count_documents({"status": "occupied"})
+        settings = get_settings()
+        if not dining_hall:
+            return db_manager.occupancy.count_documents({"status": "occupied"})
+
+        # Resilient match for configured default hall (covers records with missing or null diningHall)
+        if dining_hall == settings.DEFAULT_DINING_HALL:
+            return db_manager.occupancy.count_documents({
+                "status": "occupied",
+                "$or": [
+                    {"diningHall": dining_hall},
+                    {"diningHall": {"$exists": False}},
+                    {"diningHall": None},
+                ],
+            })
+        return db_manager.occupancy.count_documents({
+            "status": "occupied",
+            "diningHall": dining_hall,
+        })
     except (PyMongoError, Exception) as exc:
         logger.warning("Database query failed while counting active occupancy: %s. Using default 42.", exc)
         return 42
@@ -95,11 +116,19 @@ def determine_current_meal_type(now_dt: Optional[datetime] = None) -> Optional[s
         return "Dinner"
 
 
-def get_occupancy_status() -> StatusResponse:
+def get_occupancy_status(dining_hall: Optional[str] = None) -> StatusResponse:
     """Calculate and return real-time dining hall crowd and seat availability metrics."""
     settings = get_settings()
+    target_hall = dining_hall or settings.DEFAULT_DINING_HALL
+
+    # Resolve capacity for the target hall
     total_seats = settings.TOTAL_SEATS
-    occupied_seats = get_active_occupancy_count()
+    if target_hall == "North Hostel Mess":
+        total_seats = 80
+    elif target_hall == "Food Court (Student Center)":
+        total_seats = 120
+
+    occupied_seats = get_active_occupancy_count(dining_hall=target_hall)
 
     # Safeguard against inconsistent data where occupied seats exceed capacity
     if occupied_seats > total_seats:
@@ -123,4 +152,5 @@ def get_occupancy_status() -> StatusResponse:
         crowdLevel=crowd_level,
         mealType=meal_type,
         updatedAt=updated_at,
+        diningHall=target_hall,
     )

@@ -21,14 +21,15 @@ async def websocket_occupancy_endpoint(websocket: WebSocket) -> None:
     """WebSocket endpoint streaming instant mess crowd & seat occupancy events.
 
     On connection:
-    - Sends an immediate state snapshot.
+    - Sends an immediate state snapshot for the requested dining hall.
     - Listens for keepalive pings from the client.
     - Pushes real-time updates when any student checks in, returns a tray, or seat times out.
     """
+    target_hall = websocket.query_params.get("diningHall") or "Central Mess"
     await realtime_manager.connect_ws(websocket)
     try:
         # Send initial snapshot immediately upon connect
-        initial_payload = get_current_state_payload("initial_snapshot")
+        initial_payload = get_current_state_payload("initial_snapshot", dining_hall=target_hall)
         await websocket.send_text(json.dumps(initial_payload))
 
         while True:
@@ -48,18 +49,19 @@ async def websocket_occupancy_endpoint(websocket: WebSocket) -> None:
 
 @router.get("/sse/occupancy", summary="Server-Sent Events Occupancy Stream")
 @router.get("/sse/status", summary="Server-Sent Events Status Stream")
-async def sse_occupancy_endpoint(request: Request, limit: int = None) -> StreamingResponse:
+async def sse_occupancy_endpoint(request: Request, limit: int = None, diningHall: str = None) -> StreamingResponse:
     """Server-Sent Events (SSE) streaming endpoint for real-time crowd updates.
 
     Ideal fallback for environments or campus firewalls that restrict WebSockets.
     """
+    target_hall = diningHall or "Central Mess"
     queue = realtime_manager.connect_sse()
 
     async def event_generator() -> AsyncGenerator[str, None]:
         sent = 0
         try:
             # Send initial state snapshot immediately
-            initial_payload = get_current_state_payload("initial_snapshot")
+            initial_payload = get_current_state_payload("initial_snapshot", dining_hall=target_hall)
             yield f"data: {json.dumps(initial_payload)}\n\n"
             sent += 1
             if limit is not None and sent >= limit:

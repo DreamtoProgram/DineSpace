@@ -71,8 +71,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   if (hallSelector) {
+    if (Auth.getSelectedHall) {
+      currentHall = Auth.getSelectedHall();
+      hallSelector.value = currentHall;
+    }
     hallSelector.addEventListener('change', (e) => {
       currentHall = e.target.value;
+      if (Auth.setSelectedHall) Auth.setSelectedHall(currentHall);
       refreshAll();
     });
   }
