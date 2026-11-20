@@ -87,6 +87,26 @@
     .scanner-outer-card:hover {
       box-shadow: 0 0 68px -4px rgba(255, 94, 30, 0.28), inset 0 0 28px -8px rgba(255, 94, 30, 0.08);
     }
+
+    /* Live WebRTC Camera Video fit */
+    #qr-reader {
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+    }
+    #qr-reader video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      border-radius: 24px !important;
+    }
+    #qr-reader__scan_region {
+      border: none !important;
+      background: transparent !important;
+    }
+    #qr-reader__dashboard {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="bg-[#070B11] text-white min-h-screen flex flex-col md:flex-row w-full max-w-full overflow-x-hidden selection:bg-[#FF5E1E] selection:text-white">
@@ -317,47 +337,87 @@
       </div>
 
       <!-- Main Center QR Viewfinder Card -->
-      <div class="flex justify-center items-center my-auto py-2">
+      <div class="flex flex-col items-center justify-center my-auto py-2">
         <div id="scanner-interactive-card" class="scanner-outer-card p-4 sm:p-10 flex flex-col items-center justify-center relative cursor-pointer" title="Tap scanner to simulate check-in immediately">
           
           <!-- Inner Scanner Viewfinder Box -->
           <div id="viewfinder-box" class="w-full max-w-[402px] h-[280px] sm:h-[368px] rounded-[24px] bg-[#121620] border border-white/5 relative flex items-center justify-center overflow-hidden shadow-2xl">
             
-            <!-- 4 Bright Orange Curved SVG Corner Brackets with Rounded Caps -->
+            <!-- Live WebRTC Camera Stream Reader -->
+            <div id="qr-reader" class="absolute inset-0 w-full h-full overflow-hidden hidden" style="z-index: 2;"></div>
+
+            <!-- 4 Bright Orange Curved SVG Corner Brackets with Rounded Caps (z-20) -->
             <!-- Top-Left Bracket -->
-            <svg class="absolute top-4 left-4 sm:top-5 sm:left-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" viewBox="0 0 56 56" fill="none">
+            <svg class="absolute top-4 left-4 sm:top-5 sm:left-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" style="z-index: 20;" viewBox="0 0 56 56" fill="none">
               <path d="M4 52 V20 C4 11.1634 11.1634 4 20 4 H52" stroke="#FF5E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
 
             <!-- Top-Right Bracket -->
-            <svg class="absolute top-4 right-4 sm:top-5 sm:right-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" viewBox="0 0 56 56" fill="none">
+            <svg class="absolute top-4 right-4 sm:top-5 sm:right-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" style="z-index: 20;" viewBox="0 0 56 56" fill="none">
               <path d="M4 4 H36 C44.8366 4 52 11.1634 52 20 V52" stroke="#FF5E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
 
             <!-- Bottom-Left Bracket -->
-            <svg class="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" viewBox="0 0 56 56" fill="none">
+            <svg class="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" style="z-index: 20;" viewBox="0 0 56 56" fill="none">
               <path d="M4 4 V36 C4 44.8366 11.1634 52 20 52 H52" stroke="#FF5E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
 
             <!-- Bottom-Right Bracket -->
-            <svg class="absolute bottom-4 right-4 sm:bottom-5 sm:right-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" viewBox="0 0 56 56" fill="none">
+            <svg class="absolute bottom-4 right-4 sm:bottom-5 sm:right-5 w-10 h-10 sm:w-14 sm:h-14 pointer-events-none" style="z-index: 20;" viewBox="0 0 56 56" fill="none">
               <path d="M52 4 V36 C52 44.8366 44.8366 52 36 52 H4" stroke="#FF5E1E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
 
-            <!-- Animated Glowing Orange Laser Line -->
-            <div id="laser-line" class="laser-line"></div>
+            <!-- Animated Glowing Orange Laser Line (z-20) -->
+            <div id="laser-line" class="laser-line" style="z-index: 20;"></div>
 
-            <!-- Crisp Rounded QR Code -->
-            <div class="w-[170px] h-[173px] sm:w-[210px] sm:h-[213px] bg-white rounded-[18px] p-2.5 shadow-2xl flex items-center justify-center relative z-0">
+            <!-- Crisp Rounded QR Code (shown when simulation mode or camera idle) -->
+            <div id="qr-static-placeholder" class="w-[170px] h-[173px] sm:w-[210px] sm:h-[213px] bg-white rounded-[18px] p-2.5 shadow-2xl flex items-center justify-center relative z-10 transition-opacity duration-300">
               <img src="assets/images/clean_qr_code.png" alt="University Dining QR Pass" class="w-full h-full object-contain rounded-xl" />
             </div>
 
           </div>
 
           <!-- Instruction Text Exactly as in designed_pages/page_3.png -->
-          <p id="status-instruction" class="text-xs sm:text-sm text-[#8B9BB4] font-medium tracking-wide text-center mt-5 sm:mt-7">
+          <p id="status-instruction" class="text-xs sm:text-sm text-[#8B9BB4] font-medium tracking-wide text-center mt-5 sm:mt-6">
             Position your QR code inside the frame
           </p>
+
+          <!-- Camera & Simulation Controls -->
+          <div class="flex flex-wrap items-center justify-center gap-2 mt-4 z-20">
+            <button 
+              type="button" 
+              id="btn-toggle-camera" 
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500/15 border border-orange-500/30 text-[#FFA048] hover:bg-orange-500/25 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+              title="Use physical camera to scan physical QR / card"
+            >
+              <svg class="w-3.5 h-3.5 text-[#FF5E1E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span id="camera-btn-text">📷 Start Live Camera</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="btn-flip-camera" 
+              class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 text-xs font-medium transition-all cursor-pointer"
+              title="Flip camera (Front / Back)"
+            >
+              <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Flip</span>
+            </button>
+
+            <button 
+              type="button" 
+              id="btn-quick-simulate" 
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 text-xs font-medium transition-all cursor-pointer"
+              title="Click to simulate instant scan without camera"
+            >
+              <span>⚡ Tap to Simulate</span>
+            </button>
+          </div>
 
         </div>
       </div>
@@ -406,6 +466,7 @@
 
   </main>
 
+  <script src="assets/js/html5-qrcode.min.js"></script>
   <script src="js/api.js"></script>
   <script src="js/entry_scan.js"></script>
 </body>
