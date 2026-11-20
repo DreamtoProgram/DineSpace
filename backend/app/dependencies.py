@@ -98,3 +98,21 @@ async def get_current_student(
         )
 
     return student
+
+
+async def require_admin(
+    current_student: Dict[str, Any] = Depends(get_current_student),
+) -> Dict[str, Any]:
+    """Dependency ensuring the authenticated user has an 'admin' role.
+
+    Raises:
+        HTTPException(403): If the user does not have admin privileges.
+    """
+    role = current_student.get("role", "student")
+    student_id = current_student.get("studentId", "")
+    if role != "admin" and not student_id.upper().startswith("ADMIN"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Admin privileges required.",
+        )
+    return current_student

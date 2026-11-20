@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Admin Portal — DineSpace Cafeteria Management</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#FF5E1E',
+            'brand-orange': '#FF5E1E',
+            'brand-glow': 'rgba(255, 94, 30, 0.28)',
+            'dark-bg': '#070B11',
+            'card-bg': '#0C1320',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #070B11;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090E17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1B2435;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF5E1E;
+    }
+
+    .glass-card {
+      background: rgba(12, 19, 32, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 94, 30, 0.25);
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 94, 30, 0.15);
+      color: #FF5E1E;
+      border-color: rgba(255, 94, 30, 0.4);
+    }
+
+    .seat-cell {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .seat-cell:hover {
+      transform: scale(1.08);
+      z-index: 10;
+    }
+
+    .seat-available {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34D399;
+    }
+    .seat-occupied {
+      background: rgba(255, 94, 30, 0.15);
+      border-color: rgba(255, 94, 30, 0.45);
+      color: #FF8A50;
+      box-shadow: 0 0 10px -2px rgba(255, 94, 30, 0.3);
+    }
+    .seat-maintenance {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #F87171;
+    }
+    .seat-reserved {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #FBBF24;
+    }
+  </style>
+</head>
+<body class="bg-[#070B11] text-white min-h-screen flex flex-col md:flex-row w-full max-w-full overflow-x-hidden selection:bg-[#FF5E1E] selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- LEFT SIDEBAR (Desktop)                                                    -->
+  <!-- ========================================================================= -->
+  <aside class="hidden md:flex w-[280px] flex-shrink-0 bg-[#0A0F18] border-r border-white/5 flex-col justify-between p-6 min-h-screen z-20">
+    <div class="space-y-8">
+      <!-- DineSpace Brand Logo -->
+      <a href="admin.html" class="flex items-center gap-3.5 px-2 group">
+        <div class="w-11 h-11 rounded-xl overflow-hidden shadow-inner flex items-center justify-center flex-shrink-0 bg-[#221511] border border-orange-500/20">
+          <img src="assets/images/login_badge.png" alt="DineSpace" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-baseline tracking-tight">
+            <span class="text-xl font-bold text-white">Dine</span>
+            <span class="text-xl font-bold text-[#FF5E1E]">Space</span>
+          </div>
+          <span class="text-[11px] text-amber-400 font-semibold tracking-wide uppercase flex items-center gap-1">
+            <span>👑 Staff Portal</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Navigation Tabs -->
+      <nav class="space-y-2 pt-2">
+        <button type="button" data-tab="overview" class="tab-nav-btn active w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left text-sm font-medium transition-all text-white bg-white/5 border border-white/10">
+          <svg class="w-4 h-4 text-[#FF5E1E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span>Live Analytics</span>
+        </button>
+
+        <button type="button" data-tab="seats" class="tab-nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left text-sm font-medium transition-all text-[#8B9BB4] hover:text-white hover:bg-white/5">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 15v4m-4-4v4m-5 0h14"></path>
+          </svg>
+          <span>Seat Overrides</span>
+        </button>
+
+        <button type="button" data-tab="menu" class="tab-nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left text-sm font-medium transition-all text-[#8B9BB4] hover:text-white hover:bg-white/5">
+          <svg class="w-4 h-4 text-[#8B9BB4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          <span>Today's Menu</span>
+        </button>
+
+        <div class="pt-4 border-t border-white/5">
+          <a href="home.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+            </svg>
+            <span>Switch to Student View</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Manager Profile Bottom Card -->
+    <div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+          CR
+        </div>
+        <div>
+          <div id="admin-user-name" class="text-xs font-semibold text-white">Chef Rajesh</div>
+          <div id="admin-user-role" class="text-[10px] text-amber-400 font-medium">Mess Manager</div>
+        </div>
+      </div>
+      <button id="admin-logout-btn" class="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Sign Out">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTENT AREA                                                         -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 flex flex-col min-w-0 min-h-screen">
+
+    <!-- Top Bar -->
+    <header class="h-16 md:h-20 bg-[#080D15]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 sm:px-8 z-10 sticky top-0">
+      <div class="flex items-center gap-4">
+        <div>
+          <h1 class="text-base sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Cafeteria Staff Dashboard</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Live Sync
+            </span>
+          </h1>
+          <p class="text-[11px] text-[#8B9BB4] hidden sm:block">Real-time occupancy management, menu editing & seat maintenance</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Dining Hall Selector -->
+        <select id="hall-selector" class="bg-[#0C1320] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500/50 cursor-pointer">
+          <option value="Central Mess" selected>Central Mess (Main)</option>
+          <option value="North Mess">North Hostel Mess</option>
+          <option value="South Food Court">South Food Court</option>
+        </select>
+
+        <button id="refresh-data-btn" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all cursor-pointer" title="Refresh Live Data">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Nav Bar (Tabs) -->
+    <div class="md:hidden flex items-center justify-around bg-[#0A0F18] border-b border-white/5 p-2 text-xs">
+      <button data-tab="overview" class="mobile-tab-btn px-3 py-1.5 rounded-lg font-medium text-orange-400 bg-orange-500/10">Analytics</button>
+      <button data-tab="seats" class="mobile-tab-btn px-3 py-1.5 rounded-lg font-medium text-gray-400">Seats (100)</button>
+      <button data-tab="menu" class="mobile-tab-btn px-3 py-1.5 rounded-lg font-medium text-gray-400">Menu Editor</button>
+      <a href="home.html" class="px-2 py-1.5 text-gray-500">Student</a>
+    </div>
+
+    <!-- Container for dynamic tab views -->
+    <div class="p-4 sm:p-8 flex-1 space-y-8 max-w-7xl w-full mx-auto">
+
+      <!-- ===================================================================== -->
+      <!-- TAB 1: OVERVIEW & LIVE ANALYTICS                                      -->
+      <!-- ===================================================================== -->
+      <section id="tab-overview" class="tab-content space-y-6">
+        
+        <!-- Key Metrics 4-Cards Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- Card 1: Occupancy -->
+          <div class="glass-card rounded-2xl p-5 sm:p-6 relative overflow-hidden">
+            <div class="flex items-center justify-between text-xs text-[#8B9BB4] mb-2 font-medium">
+              <span>Live Occupancy</span>
+              <span id="rush-badge" class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-orange-500/15 text-[#FF8A50] border border-orange-500/25">Moderate</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-occupancy-rate" class="text-2xl sm:text-3xl font-extrabold text-white">37%</span>
+              <span id="stat-seats-fraction" class="text-xs text-gray-400">37 / 100 seats</span>
+            </div>
+            <div class="w-full h-1.5 bg-white/5 rounded-full mt-3 overflow-hidden">
+              <div id="stat-occupancy-bar" class="h-full bg-gradient-to-r from-orange-500 to-[#FF5E1E] rounded-full transition-all duration-500" style="width: 37%;"></div>
+            </div>
+          </div>
+
+          <!-- Card 2: Served Today -->
+          <div class="glass-card rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between text-xs text-[#8B9BB4] mb-2 font-medium">
+              <span>Total Served Today</span>
+              <span class="text-emerald-400">↑ 18%</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-total-served" class="text-2xl sm:text-3xl font-extrabold text-white">142</span>
+              <span class="text-xs text-gray-400">students</span>
+            </div>
+            <p class="text-[11px] text-gray-500 mt-2.5">Across breakfast, lunch & snacks</p>
+          </div>
+
+          <!-- Card 3: Avg Duration -->
+          <div class="glass-card rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between text-xs text-[#8B9BB4] mb-2 font-medium">
+              <span>Avg Dining Duration</span>
+              <span class="text-blue-400">Target &lt;25m</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-avg-duration" class="text-2xl sm:text-3xl font-extrabold text-white">18.5</span>
+              <span class="text-xs text-gray-400">mins / student</span>
+            </div>
+            <p class="text-[11px] text-emerald-400 mt-2.5">Fast seat turnaround maintained</p>
+          </div>
+
+          <!-- Card 4: Turnover Rate -->
+          <div class="glass-card rounded-2xl p-5 sm:p-6">
+            <div class="flex items-center justify-between text-xs text-[#8B9BB4] mb-2 font-medium">
+              <span>Seat Turnover</span>
+              <span class="text-amber-400">Today</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-turnover-rate" class="text-2xl sm:text-3xl font-extrabold text-white">1.42x</span>
+              <span class="text-xs text-gray-400">visits/seat</span>
+            </div>
+            <p class="text-[11px] text-gray-500 mt-2.5">Optimum seat reuse efficiency</p>
+          </div>
+
+        </div>
+
+        <!-- Hourly Throughput Distribution -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-white tracking-tight">Hourly Student Dining Throughput</h2>
+              <p class="text-xs text-[#8B9BB4]">Diners entering per 1-hour window today</p>
+            </div>
+            <span class="text-xs font-medium text-orange-400 bg-orange-500/10 px-3 py-1 rounded-lg border border-orange-500/20">Peak: 1:00 PM (76 students)</span>
+          </div>
+
+          <!-- Bar Chart Container -->
+          <div id="hourly-chart" class="flex items-end gap-2 sm:gap-3.5 h-36 pt-6 overflow-x-auto pb-2">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Real-Time Active Occupants Table -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-white tracking-tight">Active Dining Students</h2>
+              <p class="text-xs text-[#8B9BB4]">Currently seated students in Central Mess</p>
+            </div>
+            <span id="active-diners-count" class="text-xs text-gray-400 font-medium">37 active diners</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-white/5 text-[#8B9BB4] text-[11px] font-semibold uppercase">
+                  <th class="py-3 px-3">Seat #</th>
+                  <th class="py-3 px-3">Student Name</th>
+                  <th class="py-3 px-3">Student ID</th>
+                  <th class="py-3 px-3">Department</th>
+                  <th class="py-3 px-3">Elapsed Time</th>
+                  <th class="py-3 px-3">Meal</th>
+                  <th class="py-3 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="active-occupants-tbody" class="divide-y divide-white/5">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: SEAT OVERRIDES & MAINTENANCE (100 Virtual Seats)               -->
+      <!-- ===================================================================== -->
+      <section id="tab-seats" class="tab-content hidden space-y-6">
+        
+        <!-- Header & Color Legend -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">Virtual Seat Management (1..100)</h2>
+              <p class="text-xs text-[#8B9BB4]">Click any seat to mark broken/maintenance, reserve for VIPs, or force-release.</p>
+            </div>
+            
+            <!-- Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Available
+              </span>
+              <span class="inline-flex items-center gap-1.5 text-xs text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-lg border border-orange-500/20">
+                <span class="w-2 h-2 rounded-full bg-orange-400"></span> Occupied
+              </span>
+              <span class="inline-flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 px-2.5 py-1 rounded-lg border border-red-500/20">
+                <span class="w-2 h-2 rounded-full bg-red-400"></span> Maintenance
+              </span>
+              <span class="inline-flex items-center gap-1.5 text-xs text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span> Reserved
+              </span>
+            </div>
+          </div>
+
+          <!-- Zone Selector -->
+          <div class="flex flex-wrap gap-2 pt-2 border-t border-white/5">
+            <button type="button" data-zone="all" class="zone-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 text-white">All Seats (1-100)</button>
+            <button type="button" data-zone="a" class="zone-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Zone A (1-25)</button>
+            <button type="button" data-zone="b" class="zone-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Zone B (26-50)</button>
+            <button type="button" data-zone="c" class="zone-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Zone C (51-75)</button>
+            <button type="button" data-zone="d" class="zone-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Zone D (76-100)</button>
+          </div>
+        </div>
+
+        <!-- 100 Seats Grid -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6">
+          <div id="seats-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-3">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: MENU EDITOR                                                    -->
+      <!-- ===================================================================== -->
+      <section id="tab-menu" class="tab-content hidden space-y-6">
+        
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">Today's Menu Management</h2>
+              <p class="text-xs text-[#8B9BB4]">Add new dishes, modify nutritional values, or remove items in real-time.</p>
+            </div>
+
+            <button id="btn-open-add-dish" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF5E1E] hover:bg-orange-600 text-white text-xs font-semibold transition-all shadow-lg shadow-orange-500/20 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Add Dish</span>
+            </button>
+          </div>
+
+          <!-- Meal Category Tabs -->
+          <div class="flex gap-2 pt-2 border-t border-white/5">
+            <button type="button" data-meal="Lunch" class="meal-tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold bg-orange-500/20 text-[#FF5E1E] border border-orange-500/30">Lunch</button>
+            <button type="button" data-meal="Dinner" class="meal-tab-btn px-4 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Dinner</button>
+            <button type="button" data-meal="Breakfast" class="meal-tab-btn px-4 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Breakfast</button>
+            <button type="button" data-meal="Snacks" class="meal-tab-btn px-4 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5">Snacks</button>
+          </div>
+        </div>
+
+        <!-- Menu Items Grid -->
+        <div id="menu-items-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: SEAT ACTIONS                                                       -->
+  <!-- ========================================================================= -->
+  <div id="seat-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-card bg-[#0D1522] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <h3 id="modal-seat-title" class="text-base font-bold text-white">Seat #24 Actions</h3>
+        <button id="modal-seat-close" class="text-gray-400 hover:text-white cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div id="modal-seat-details" class="space-y-2 text-xs">
+        <!-- Details injected dynamically -->
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <label class="block text-xs font-medium text-gray-300">Staff Note / Reason (Optional)</label>
+        <input type="text" id="modal-seat-note" placeholder="e.g., Table leg repair, VIP guest" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button id="modal-btn-maintenance" class="px-3 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 text-xs font-semibold cursor-pointer">
+          🛠 Mark Maintenance
+        </button>
+        <button id="modal-btn-reserved" class="px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 hover:bg-amber-500/25 text-xs font-semibold cursor-pointer">
+          ⭐ Mark Reserved
+        </button>
+        <button id="modal-btn-available" class="px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 text-xs font-semibold cursor-pointer">
+          ✅ Set Available
+        </button>
+        <button id="modal-btn-release" class="px-3 py-2 rounded-xl bg-orange-500/15 border border-orange-500/30 text-[#FF8A50] hover:bg-orange-500/25 text-xs font-semibold cursor-pointer">
+          ⚡ Force Release
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: ADD / EDIT MENU ITEM                                               -->
+  <!-- ========================================================================= -->
+  <div id="dish-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-card bg-[#0D1522] border border-white/10 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-white/5 pb-3">
+        <h3 id="dish-modal-title" class="text-base font-bold text-white">Add New Dish</h3>
+        <button id="dish-modal-close" class="text-gray-400 hover:text-white cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="dish-form" class="space-y-4 text-xs">
+        <input type="hidden" id="dish-edit-old-name" value="" />
+        
+        <div>
+          <label class="block text-gray-300 font-medium mb-1">Dish Name *</label>
+          <input type="text" id="dish-name" required placeholder="e.g. Paneer Butter Masala" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-medium mb-1">Category</label>
+            <select id="dish-category" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500/50">
+              <option value="Mains">Mains</option>
+              <option value="Staples">Staples</option>
+              <option value="Breads">Breads</option>
+              <option value="Dessert">Dessert</option>
+              <option value="Beverages">Beverages</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-300 font-medium mb-1">Dietary Tag</label>
+            <select id="dish-dietary" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500/50">
+              <option value="Vegetarian">Vegetarian</option>
+              <option value="Vegan">Vegan</option>
+              <option value="Non-Vegetarian">Non-Vegetarian</option>
+              <option value="Egg">Egg</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 font-medium mb-1">Estimated Calories (kcal)</label>
+            <input type="number" id="dish-calories" placeholder="e.g. 320" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50" />
+          </div>
+
+          <div>
+            <label class="block text-gray-300 font-medium mb-1">Meal Schedule</label>
+            <select id="dish-meal-type" class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500/50">
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Snacks">Snacks</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 font-medium mb-1">Description</label>
+          <textarea id="dish-description" rows="2" placeholder="e.g. Fresh cottage cheese cooked in creamy tomato butter sauce." class="w-full bg-[#080D15] border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="dish-cancel-btn" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium cursor-pointer">Cancel</button>
+          <button type="submit" id="dish-submit-btn" class="px-4 py-2 rounded-xl bg-[#FF5E1E] hover:bg-orange-600 text-white font-semibold shadow-lg shadow-orange-500/20 cursor-pointer">Save Dish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

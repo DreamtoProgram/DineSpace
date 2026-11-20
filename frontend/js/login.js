@@ -63,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
       department: 'Campus Dining',
       passCode: 'PASS-9999',
       defaultSeat: 1
+    },
+    'ADMIN01': {
+      studentId: 'ADMIN01',
+      name: 'Chef Rajesh (Mess Manager)',
+      department: 'Dining Services Management',
+      passCode: 'PASS-ADMIN',
+      role: 'admin',
+      defaultSeat: 1
     }
   };
 
@@ -145,9 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.classList.add('bg-emerald-600');
       submitText.textContent = 'Welcome, ' + (student.name || studentId) + '!';
       
+      const targetPage = (student.role === 'admin' || student.studentId === 'ADMIN01') ? 'admin.html' : 'home.html';
       setTimeout(() => {
-        // Navigate to Home Dashboard
-        window.location.href = 'home.html';
+        window.location.href = targetPage;
       }, 400);
 
     } catch (err) {
@@ -174,8 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.classList.remove('btn-primary');
         submitBtn.classList.add('bg-emerald-600');
         submitText.textContent = 'Welcome, ' + profile.name + '!';
+        const fallbackTarget = (profile.role === 'admin' || profile.studentId === 'ADMIN01') ? 'admin.html' : 'home.html';
         setTimeout(() => {
-          window.location.href = 'home.html';
+          window.location.href = fallbackTarget;
         }, 400);
         return;
       }

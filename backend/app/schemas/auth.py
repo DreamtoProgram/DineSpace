@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -13,6 +14,8 @@ class StudentPublic(BaseModel):
 
     studentId: str = Field(..., description="Unique student ID")
     name: str = Field(..., description="Student's full name")
+    role: str = Field(default="student", description="Account role: 'student' or 'admin'")
+    department: Optional[str] = Field(default=None, description="Department or staff unit")
 
 
 class LoginResponse(BaseModel):

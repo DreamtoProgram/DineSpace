@@ -6,8 +6,8 @@ class SeatItem(BaseModel):
     """Schema representing an individual virtual seat and its occupancy state."""
 
     seatNumber: int = Field(..., description="Virtual seat number (1 through capacity)")
-    status: Literal["available", "occupied"] = Field(
-        ..., description="Current status of the seat: 'available' or 'occupied'"
+    status: Literal["available", "occupied", "maintenance", "reserved"] = Field(
+        ..., description="Current status of the seat: 'available', 'occupied', 'maintenance', or 'reserved'"
     )
 
 

@@ -96,7 +96,7 @@ def assign_virtual_seat_and_checkin(
         occupied_seats = set(
             db_manager.occupancy.distinct(
                 "seatNumber",
-                {"diningHall": hall, "status": "occupied"},
+                {"diningHall": hall, "status": {"$in": ["occupied", "maintenance", "reserved"]}},
             )
         )
     except PyMongoError as exc:

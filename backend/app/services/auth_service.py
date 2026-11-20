@@ -60,7 +60,17 @@ DEMO_STUDENTS: Dict[str, Dict[str, Any]] = {
         "name": "Inactive Student",
         "passCode": "PASS-9999",
         "isActive": False,
+        "role": "student",
         "department": "Campus Dining",
+        "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
+    },
+    "ADMIN01": {
+        "studentId": "ADMIN01",
+        "name": "Chef Rajesh (Mess Manager)",
+        "passCode": "PASS-ADMIN",
+        "isActive": True,
+        "role": "admin",
+        "department": "Dining Services Management",
         "passwordHash": "$2b$12$Q7qOwKhRrpYd9t2syAWYUey6aS1DqDatwlDXeJnfZ9y6/pe/XB7TK",
     },
 }
@@ -92,12 +102,14 @@ def get_student_by_id(student_id: str) -> Optional[Dict[str, Any]]:
         return DEMO_STUDENTS[student_id]
 
     # Dynamic fallback: return a valid student record for custom student IDs
+    is_admin = student_id.upper().startswith("ADMIN") or student_id.upper().startswith("MESS_ADMIN")
     return {
         "studentId": student_id,
         "name": "Kunal Kumar Singh" if student_id == "P132-NNK" else ("Sarah Chen" if student_id == "STU1042" else f"Student ({student_id})"),
         "passCode": f"PASS-{student_id[-4:] if len(student_id) >= 4 else '1042'}",
         "isActive": True,
-        "department": "Computer Science & Engineering",
+        "role": "admin" if is_admin else "student",
+        "department": "Dining Services Management" if is_admin else "Computer Science & Engineering",
     }
 
 

@@ -212,5 +212,49 @@ const API = {
       method: 'PATCH',
       body: JSON.stringify({ currentPassword, newPassword })
     });
+  },
+
+  // --- Admin Portal Methods ---
+  async getAdminAnalytics(diningHall = 'Central Mess') {
+    return apiRequest('/admin/analytics?diningHall=' + encodeURIComponent(diningHall));
+  },
+
+  async getAdminSeats(diningHall = 'Central Mess') {
+    return apiRequest('/admin/seats?diningHall=' + encodeURIComponent(diningHall));
+  },
+
+  async setAdminSeatStatus(seatNumber, status, note = '', diningHall = 'Central Mess') {
+    return apiRequest('/admin/seats/status', {
+      method: 'POST',
+      body: JSON.stringify({ seatNumber, status, note, diningHall })
+    });
+  },
+
+  async releaseAdminSeat(seatNumber, reason = 'Manager override', diningHall = 'Central Mess') {
+    return apiRequest('/admin/seats/release', {
+      method: 'POST',
+      body: JSON.stringify({ seatNumber, reason, diningHall })
+    });
+  },
+
+  async addAdminMenuItem(mealType, item, date = null) {
+    return apiRequest('/admin/menu/item', {
+      method: 'POST',
+      body: JSON.stringify({ mealType, item, date })
+    });
+  },
+
+  async updateAdminMenuItem(mealType, itemName, item, date = null) {
+    return apiRequest('/admin/menu/item', {
+      method: 'PUT',
+      body: JSON.stringify({ mealType, itemName, item, date })
+    });
+  },
+
+  async deleteAdminMenuItem(mealType, itemName, date = null) {
+    return apiRequest('/admin/menu/item', {
+      method: 'DELETE',
+      body: JSON.stringify({ mealType, itemName, date })
+    });
   }
 };

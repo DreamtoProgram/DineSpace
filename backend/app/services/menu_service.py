@@ -182,3 +182,39 @@ def upsert_menu(date_str: str, meal_type: str, items: List[Dict[str, str]]) -> D
     except (PyMongoError, Exception) as exc:
         logger.warning("Failed to upsert menu for %s (%s): %s. Returning memory record.", date_str, meal_type, exc)
         return record
+
+
+def add_menu_item(date_str: str, meal_type: str, item: Dict[str, Any]) -> Dict[str, Any]:
+    """Add a new item to the menu for a given date and meal type."""
+    current_menu = get_menu_for_date_and_meal(date_str, meal_type)
+    items = list(current_menu.get("items", [])) if current_menu else []
+    # Avoid duplicate name
+    items = [i for i in items if i.get("name") != item.get("name")]
+    items.append(item)
+    return upsert_menu(date_str, meal_type, items)
+
+
+def update_menu_item(date_str: str, meal_type: str, item_name: str, new_item: Dict[str, Any]) -> Dict[str, Any]:
+    """Update an existing menu item by name."""
+    current_menu = get_menu_for_date_and_meal(date_str, meal_type)
+    items = list(current_menu.get("items", [])) if current_menu else []
+    updated = False
+    new_items = []
+    for it in items:
+        if it.get("name") == item_name:
+            new_items.append(new_item)
+            updated = True
+        else:
+            new_items.append(it)
+    if not updated:
+        new_items.append(new_item)
+    return upsert_menu(date_str, meal_type, new_items)
+
+
+def delete_menu_item(date_str: str, meal_type: str, item_name: str) -> Dict[str, Any]:
+    """Remove a menu item by name."""
+    current_menu = get_menu_for_date_and_meal(date_str, meal_type)
+    items = list(current_menu.get("items", [])) if current_menu else []
+    filtered_items = [i for i in items if i.get("name") != item_name]
+    return upsert_menu(date_str, meal_type, filtered_items)
+

@@ -42,6 +42,8 @@ def login(payload: LoginRequest) -> LoginResponse:
         student=StudentPublic(
             studentId=student["studentId"],
             name=student["name"],
+            role=student.get("role", "student"),
+            department=student.get("department"),
         ),
     )
 
@@ -65,4 +67,6 @@ def get_current_user_profile(
     return StudentPublic(
         studentId=current_student["studentId"],
         name=current_student["name"],
+        role=current_student.get("role", "student"),
+        department=current_student.get("department"),
     )

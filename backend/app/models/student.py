@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -9,3 +10,5 @@ class Student(BaseModel):
     passCode: str = Field(..., description="Unique dining hall entry pass code (e.g. PASS-8842)")
     passwordHash: str = Field(..., description="Secure bcrypt hash of the student password")
     isActive: bool = Field(default=True, description="Whether the student account is active for login")
+    role: str = Field(default="student", description="User role: 'student' or 'admin'")
+    department: Optional[str] = Field(default=None, description="Academic department or staff role")

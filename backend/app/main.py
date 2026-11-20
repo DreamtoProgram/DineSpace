@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
 from app.database import db_manager
 from app.routes.auth import router as auth_router
+from app.routes.admin import router as admin_router
 from app.routes.health import router as health_router
 from app.routes.menu import router as menu_router
 from app.routes.notifications import router as notifications_router
@@ -147,6 +148,7 @@ app.include_router(seats_router, prefix=settings.API_V1_PREFIX)
 app.include_router(visits_router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications_router, prefix=settings.API_V1_PREFIX)
 app.include_router(settings_router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin_router, prefix=settings.API_V1_PREFIX)
 
 # Determine frontend static directory with comprehensive fallbacks
 frontend_candidates = [

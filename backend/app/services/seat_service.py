@@ -51,17 +51,19 @@ def get_virtual_seat_map(
 
     query = {
         **hall_condition,
-        "status": "occupied",
+        "status": {"$in": ["occupied", "maintenance", "reserved"]},
         "exitTime": None,
     }
     projection = {
         "seatNumber": 1,
         "studentId": 1,
+        "status": 1,
+        "note": 1,
         "_id": 0,
     }
 
     default_occupied_docs = [
-        {"seatNumber": s, "studentId": f"STU{1000+s}"}
+        {"seatNumber": s, "studentId": f"STU{1000+s}", "status": "occupied"}
         for s in [3, 7, 12, 18, 25, 31, 34, 42, 51, 58, 64, 71, 77, 85, 92]
     ]
 
@@ -75,42 +77,62 @@ def get_virtual_seat_map(
             occupied_docs = default_occupied_docs
 
     occupied_seats = set()
+    maintenance_seats = set()
+    reserved_seats = set()
+    seat_info_map = {}
     my_seat: Optional[int] = None
 
     for doc in occupied_docs:
         seat_num = doc.get("seatNumber")
         student_id = doc.get("studentId")
-
-        # Check if the occupied seat belongs to the authenticated student
-        if student_id == current_student_id and isinstance(seat_num, int):
-            my_seat = seat_num
+        st = doc.get("status", "occupied")
+        note = doc.get("note")
 
         # Defensively validate seat bounds against configured capacity
         if not isinstance(seat_num, int) or seat_num < 1 or seat_num > capacity:
             logger.warning(
-                "Data anomaly: occupied seatNumber %r is out of bounds (1..%d). Ignoring in seat map.",
+                "Data anomaly: seatNumber %r is out of bounds (1..%d). Ignoring in seat map.",
                 seat_num,
                 capacity,
             )
             continue
 
-        occupied_seats.add(seat_num)
+        if st == "occupied":
+            occupied_seats.add(seat_num)
+            if student_id == current_student_id:
+                my_seat = seat_num
+            seat_info_map[seat_num] = {"status": "occupied", "studentId": student_id, "note": note}
+        elif st == "maintenance":
+            maintenance_seats.add(seat_num)
+            seat_info_map[seat_num] = {"status": "maintenance", "studentId": None, "note": note}
+        elif st == "reserved":
+            reserved_seats.add(seat_num)
+            seat_info_map[seat_num] = {"status": "reserved", "studentId": None, "note": note}
 
     # Compute occupancy statistics
     occupied_count = len(occupied_seats)
-    available_count = max(0, capacity - occupied_count)
+    unavailable_count = occupied_count + len(maintenance_seats) + len(reserved_seats)
+    available_count = max(0, capacity - unavailable_count)
 
     # Find the lowest-numbered available seat (1..capacity)
     next_available_seat: Optional[int] = None
     for s in range(1, capacity + 1):
-        if s not in occupied_seats:
+        if s not in seat_info_map:
             next_available_seat = s
             break
 
     # Build the virtual seats array in ascending order
     seat_items = []
     for seat_num in range(1, capacity + 1):
-        current_status = "occupied" if seat_num in occupied_seats else "available"
+        if seat_num in seat_info_map:
+            info = seat_info_map[seat_num]
+            current_status = info["status"]
+            current_student = info.get("studentId")
+            current_note = info.get("note")
+        else:
+            current_status = "available"
+            current_student = None
+            current_note = None
 
         # Apply optional status filter if provided
         if status_filter is not None and current_status != status_filter:
