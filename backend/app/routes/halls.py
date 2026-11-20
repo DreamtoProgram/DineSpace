@@ -8,15 +8,21 @@ from app.services.hall_service import (
 )
 from app.services.occupancy_service import get_occupancy_status
 
-router = APIRouter(prefix="/halls", tags=["Dining Halls"])
+router = APIRouter(tags=["Dining Halls"])
 
 
 @router.get(
-    "",
+    "/halls",
     response_model=DiningHallsListResponse,
     status_code=status.HTTP_200_OK,
     summary="List Campus Dining Halls",
     description="Retrieve list of all active campus dining halls and multi-campus facilities with live occupancy metrics.",
+)
+@router.get(
+    "/halls/",
+    response_model=DiningHallsListResponse,
+    status_code=status.HTTP_200_OK,
+    include_in_schema=False,
 )
 def list_dining_halls(
     includeStatus: bool = Query(
@@ -29,7 +35,7 @@ def list_dining_halls(
 
 
 @router.get(
-    "/{hall_id}",
+    "/halls/{hall_id}",
     response_model=DiningHallSummary,
     status_code=status.HTTP_200_OK,
     summary="Get Dining Hall Details",
